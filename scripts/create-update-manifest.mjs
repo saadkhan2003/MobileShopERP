@@ -55,7 +55,11 @@ for (const [platform, assets] of Object.entries(expected)) {
     const matches = files.filter((path) => path.endsWith(asset.suffix) && !path.endsWith(".sig"));
     if (matches.length !== 1) throw new Error(`Expected one ${platform} ${asset.suffix} artifact, found ${matches.length}`);
     const path = matches[0];
-    if (!basename(path).includes(version) || statSync(path).size === 0) throw new Error(`Invalid or empty release asset: ${path}`);
+    // Tauri names the macOS updater archive after the app, without its version.
+    const versionlessMacUpdater = platform.startsWith("macos-") && asset.suffix === ".app.tar.gz";
+    if ((!versionlessMacUpdater && !basename(path).includes(version)) || statSync(path).size === 0) {
+      throw new Error(`Invalid or empty release asset: ${path}`);
+    }
     const url = copyArtifact(platform, path);
     if (asset.key) {
       const signaturePath = `${path}.sig`;

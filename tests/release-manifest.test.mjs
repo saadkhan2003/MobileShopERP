@@ -21,7 +21,10 @@ test("release manifest sends every installed package type to its signed update",
       const directory = join(input, `release-${platform}`);
       mkdirSync(directory, { recursive: true });
       for (const extension of extensions) {
-        const path = join(directory, `Mobile Shop ERP_${version}_${platform}.${extension}`);
+        const filename = extension === "app.tar.gz"
+          ? "Mobile Shop ERP.app.tar.gz"
+          : `Mobile Shop ERP_${version}_${platform}.${extension}`;
+        const path = join(directory, filename);
         writeFileSync(path, "fixture package");
         if (extension !== "dmg") writeFileSync(`${path}.sig`, `signature-for-${platform}-${extension}`);
       }
