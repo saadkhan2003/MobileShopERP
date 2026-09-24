@@ -49,6 +49,13 @@ test("release manifest sends every installed package type to its signed update",
     assert.match(manifest.platforms["linux-x86_64-deb"].url, /linux-x64-.*\.deb$/);
     assert.match(manifest.platforms["darwin-aarch64-app"].url, /macos-arm64-.*\.app\.tar\.gz$/);
     assert.equal(readdirSync(output).length, 15);
+    writeFileSync(policyPath, JSON.stringify({ version, critical: true, minimum_version: "0.0.0", notes: "Invalid" }));
+    const invalid = spawnSync(process.execPath, ["scripts/create-update-manifest.mjs", input, output], {
+      encoding: "utf8",
+      env: { ...process.env, MOBILE_SHOP_RELEASE_POLICY: policyPath },
+    });
+    assert.notEqual(invalid.status, 0);
+    assert.match(invalid.stderr, /critical release must set minimum_version/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

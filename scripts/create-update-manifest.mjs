@@ -9,6 +9,13 @@ if (policy.version !== version || typeof policy.critical !== "boolean" || typeof
   || typeof policy.minimum_version !== "string" || !/^\d+\.\d+\.\d+$/.test(policy.minimum_version)) {
   throw new Error("release-policy.json must match the app version and declare critical, minimum_version, and notes");
 }
+const minimumParts = policy.minimum_version.split(".").map(Number);
+const releaseParts = version.split(".").map(Number);
+const firstDifference = minimumParts.findIndex((part, index) => part !== releaseParts[index]);
+const minimumAboveRelease = firstDifference >= 0 && minimumParts[firstDifference] > releaseParts[firstDifference];
+if (minimumAboveRelease || (policy.critical && policy.minimum_version !== version)) {
+  throw new Error("A critical release must set minimum_version to its version, and the minimum cannot exceed the release version");
+}
 const repository = process.env.MOBILE_SHOP_RELEASE_REPOSITORY || "saadkhan2003/MobileShopERP";
 const base = `https://github.com/${repository}/releases/download/v${version}`;
 const platforms = {};
