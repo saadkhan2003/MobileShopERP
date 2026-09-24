@@ -1,0 +1,48 @@
+{
+  "name": "mobile-shop-erp-desktop",
+  "version": "0.2.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "tauri": "tauri",
+    "desktop": "tauri dev",
+    "release:signed": "node scripts/build-signed-release.mjs",
+    "release:manifest": "node scripts/create-update-manifest.mjs",
+    "test:backend": "cargo test --manifest-path rust/Cargo.toml",
+    "test:ui": "vitest run",
+    "test": "npm run test:ui && npm run test:backend"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.5.0",
+    "@fontsource-variable/geist": "^5.2.9",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.7.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "jsbarcode": "^3.12.3",
+    "lucide-react": "^0.487.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/jsbarcode": "^3.11.4",
+    "@types/react": "^18.3.22",
+    "@types/react-dom": "^18.3.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "autoprefixer": "^10.4.21",
+    "jsdom": "^30.1.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4",
+    "vitest": "^5.0.1"
+  }
+}

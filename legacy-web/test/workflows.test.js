@@ -1,0 +1,47 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+const dir=mkdtempSync(path.join(os.tmpdir(),'shop-test-'));
+const port=19000+Math.floor(Math.random()*40000);
+const child=spawn(process.execPath,['server.js'],{cwd:process.cwd(),env:{...process.env,PORT:String(port),SHOP_DATA_DIR:dir},stdio:'ignore'});
+let token='';
+async function call(url,method='GET',data){const r=await fetch(`http://127.0.0.1:${port}/api${url}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:data===undefined?undefined:JSON.stringify(data)});const j=await r.json();return Array.isArray(j)?j:{status:r.status,...j};}
+async function ready(){for(let i=0;i<100;i++){try{await fetch(`http://127.0.0.1:${port}/api/status`);return}catch{await new Promise(r=>setTimeout(r,50))}}throw Error('Server did not start')}
+test('shop workflows: IMEI, accessory stock, sale, installments, repair and returns',async()=>{try{await ready();assert.equal((await call('/status')).setup,true);assert.equal((await call('/setup','POST',{name:'Owner',username:'owner',password:'test-only-123'})).ok,true);token=(await call('/login','POST',{username:'owner',password:'test-only-123'})).token;assert.ok(token);
+const customer=(await call('/contacts','POST',{kind:'customer',name:'Ali',phone:'03001234567'})).id;
+const supplier=(await call('/contacts','POST',{kind:'supplier',name:'Wholesale'})).id;
+const phone=(await call('/products','POST',{name:'Samsung A55',category:'phone',cost:65000,price:75000,min_price:68000,warranty_days:365})).id;
+const charger=(await call('/products','POST',{name:'Fast Charger',category:'charger',cost:500,price:900,reorder_level:2})).id;
+const part=(await call('/products','POST',{name:'Screen',category:'spare_part',cost:1200,price:1800})).id;
+const purchase=await call('/purchases','POST',{supplier_id:supplier,paid:50000,lines:[{product_id:phone,unit_cost:65000,imeis:[{imei1:'111111111111111',imei2:'222222222222222',pta_status:'verified'}]},{product_id:charger,quantity:5,unit_cost:500},{product_id:part,quantity:3,unit_cost:1200}]});assert.equal(purchase.total,71100);
+const duplicate=await call('/purchases','POST',{supplier_id:supplier,lines:[{product_id:phone,unit_cost:65000,imeis:[{imei1:'111111111111111'}]}]});assert.equal(duplicate.status,409);assert.equal((await call('/purchases')).length,1);
+const phones=await call('/phones');assert.equal(phones.length,1);const sale=await call('/sales','POST',{customer_id:customer,discount:1000,lines:[{product_id:phone,phone_id:phones[0].id,unit_price:75000},{product_id:charger,quantity:2,unit_price:900}],payments:[{method:'cash',amount:40000},{method:'easypaisa',amount:10000}]});assert.equal(sale.total,75800);
+assert.equal((await call('/phones'))[0].status,'sold');assert.equal((await call('/products')).find(x=>x.id===charger).quantity,3);
+const resale=await call('/sales','POST',{customer_id:customer,lines:[{product_id:phone,phone_id:phones[0].id,unit_price:75000}]});assert.equal(resale.status,400);
+assert.equal((await call('/sales/'+sale.id)).paid,50000);
+assert.equal((await call('/sales/'+sale.id+'/installments','POST',{entries:[{due_date:'2027-01-01',amount:12000},{due_date:'2027-02-01',amount:13800}]})).ok,true);
+assert.equal((await call('/installments')).length,2);
+assert.equal((await call('/installments/1/pay','POST',{amount:12000,method:'bank'})).ok,true);
+assert.equal((await call('/sales/'+sale.id)).paid,62000);
+const repair=await call('/repairs','POST',{customer_id:customer,model:'Old iPhone',fault:'Broken screen',labor_charge:2500});assert.ok(repair.id);
+assert.equal((await call('/repairs/'+repair.id+'/parts','POST',{product_id:part,quantity:1})).ok,true);
+assert.equal((await call('/products')).find(x=>x.id===part).quantity,2);
+const used=await call('/used-purchases','POST',{customer_id:customer,product_id:phone,imei1:'333333333333333',agreed_price:20000,paid:20000});assert.ok(used.id);
+const purchaseLines=await call('/purchase-lines?purchase_id='+purchase.id);const chargerLine=purchaseLines.find(x=>x.product_id===charger);assert.ok(chargerLine);
+assert.equal((await call('/purchase-returns','POST',{purchase_line_id:chargerLine.id,quantity:1,refund:500})).status,200);
+assert.equal((await call('/products')).find(x=>x.id===charger).quantity,2);
+const tradeSale=await call('/sales','POST',{customer_id:customer,trade_in_value:5000,trade_in:{product_id:phone,imei1:'444444444444444',condition_grade:'B',checklist:{Screen:true}},lines:[{product_id:charger,quantity:1,unit_price:9000}],payments:[{method:'cash',amount:4000}]});assert.equal(tradeSale.total,4000);
+const tradePhone=(await call('/phones')).find(h=>h.imei1==='444444444444444');assert.equal(tradePhone.status,'available');assert.equal(tradePhone.purchase_cost,5000);
+const history=await call('/phone-history?imei=111111111111111');assert.equal(history.sale.invoice_no,sale.invoice_no);assert.equal(history.phone.status,'sold');
+assert.ok((await call('/reports')).phoneProfit.some(p=>p.imei1==='111111111111111'));
+assert.equal((await call('/products/'+charger,'PATCH',{price:950})).ok,true);assert.equal((await call('/price-history')).length,1);
+assert.equal((await call('/market-rates','POST',{product_id:phone,buy_rate:70000,sell_rate:80000})).status,200);
+const backup=await call('/backup','POST',{});assert.equal(backup.name.startsWith('backup-'),true);
+assert.equal((await call('/products/'+charger,'PATCH',{price:1400})).ok,true);
+assert.equal((await call('/restore','POST',{name:backup.name})).ok,true);
+assert.equal((await call('/products')).find(x=>x.id===charger).price,950);
+}finally{child.kill();rmSync(dir,{recursive:true,force:true})}});

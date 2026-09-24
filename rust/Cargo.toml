@@ -1,0 +1,19 @@
+[package]
+name = "mobile_shop_backend"
+version = "0.2.0"
+edition = "2024"
+
+[lib]
+name = "mobile_shop_backend"
+path = "src/lib.rs"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+hex = "0.4"
+rand = "0.9"
+rusqlite = { version = "0.40", features = ["bundled", "backup"] }
+scrypt = "0.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+subtle = "2"
+url = "2"
