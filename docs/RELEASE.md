@@ -8,7 +8,7 @@ The signing private key is stored as the repository Actions secret `MOBILE_SHOP_
 
 ## Package routing
 
-The [manifest script](../scripts/create-update-manifest.mjs) requires all six signed updater targets before publishing. Tauri identifies the installed bundle and selects the matching key automatically:
+The [manifest script](../scripts/create-update-manifest.mjs) requires all six signed updater targets before publishing. Tauri identifies the installed bundle and selects the matching key automatically. It also reads [release-policy.json](../release-policy.json): set `critical` to `true` for a release that must install before staff can resume shop operations. Set `minimum_version` to that critical version and carry the same minimum into later releases, so installations that missed the critical release still have to update. Normal releases use `false`. The policy version must match the application version.
 
 | Installed package | Manifest target | Signed updater payload |
 | --- | --- | --- |
@@ -23,12 +23,14 @@ The release also carries the two `.dmg` installers. DMG files are for initial in
 
 ## Publish the next version
 
-1. Change the version in `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` (and their lockfiles). Commit and push the source.
+1. Change the version in `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and `release-policy.json` (and their lockfiles). Decide whether the release is critical and write its notes in the policy. Commit and push the source.
 2. Confirm the normal desktop build workflow passes.
 3. Push the matching tag, for example `git tag v0.3.0` then `git push origin v0.3.0`.
 4. Wait for **Publish signed desktop release** to finish, then check its release assets and `latest.json`.
 5. Install an older package of each supported type on its operating system and verify **Global settings → Check for updates → Install signed update**. The prior 0.2.0-to-0.2.1 AppImage update was tested end to end; the other operating systems need installation checks on those systems.
 
-The workflow refuses to publish if any package or updater signature is missing. A normal development build has no update feed; only the signed release build embeds the public key and this repository's feed URL. The separate `mobile-shop-erp-releases` repository is retained only for installations of versions 0.2.0 and 0.2.1 that were built with its old feed URL. Its `latest.json` was updated after the 0.3.0 release to point those installations to signed 0.3.0 packages in this repository. Keep that compatibility feed current for future releases while those older installations remain in use.
+The workflow refuses to publish if any package or updater signature is missing. A normal development build has no update feed; only the signed release build embeds the public key and this repository's feed URL. The app checks at startup, every 30 minutes, and on focus after five minutes; it shows a banner for ordinary releases. A critical release installs automatically and the shop screen remains blocked if installation fails. A known critical version is saved locally, so restarting offline does not bypass the block. An installation that has never received the critical manifest cannot know about it while offline. Versions before 0.3.1 do not have this automatic critical-update behavior and must first install a newer release manually.
+
+The separate `mobile-shop-erp-releases` repository is retained only for installations of versions 0.2.0 and 0.2.1 that were built with its old feed URL. Its `latest.json` was updated after the 0.3.0 release to point those installations to signed 0.3.0 packages in this repository. Keep that compatibility feed current for future releases while those older installations remain in use.
 
 Implementation uses the [Tauri updater format and installer-specific platform keys](https://v2.tauri.app/plugin/updater/).

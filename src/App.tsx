@@ -52,6 +52,7 @@ import { Label } from "./components/ui/label";
 import { Badge } from "./components/ui/badge";
 import { SearchSelect } from "./components/ui/search-select";
 import { ReportCharts } from "./components/reports/ReportCharts";
+import { UpdateCenter } from "./components/updates/UpdateCenter";
 import { saveInvoicePdf, saveRepairPdf } from "./lib/pdf";
 import {
   DEFAULT_SHOP_SETTINGS,
@@ -1133,7 +1134,7 @@ function App() {
     setLines([]);
   };
   return (
-    <div className="flex h-full min-h-0 overflow-hidden bg-background text-foreground">
+    <div id="shop-app-shell" className="flex h-full min-h-0 overflow-hidden bg-background text-foreground">
       <aside
         data-testid="shop-sidebar"
         data-collapsed={sidebarCollapsed}
@@ -1245,6 +1246,7 @@ function App() {
             ● Offline ready
           </span>
         </header>
+        <UpdateCenter />
         <div key={section} className="page-enter mx-auto max-w-7xl p-8">
           <PageHeader
             title={m.title}

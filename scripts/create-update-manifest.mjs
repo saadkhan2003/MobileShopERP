@@ -4,6 +4,11 @@ import { basename, join } from "node:path";
 const input = process.argv[2] || "release-input";
 const output = process.argv[3] || "release-output";
 const version = JSON.parse(readFileSync("package.json", "utf8")).version;
+const policy = JSON.parse(readFileSync(process.env.MOBILE_SHOP_RELEASE_POLICY || "release-policy.json", "utf8"));
+if (policy.version !== version || typeof policy.critical !== "boolean" || typeof policy.notes !== "string"
+  || typeof policy.minimum_version !== "string" || !/^\d+\.\d+\.\d+$/.test(policy.minimum_version)) {
+  throw new Error("release-policy.json must match the app version and declare critical, minimum_version, and notes");
+}
 const repository = process.env.MOBILE_SHOP_RELEASE_REPOSITORY || "saadkhan2003/MobileShopERP";
 const base = `https://github.com/${repository}/releases/download/v${version}`;
 const platforms = {};
@@ -72,6 +77,6 @@ for (const [platform, assets] of Object.entries(expected)) {
   }
 }
 
-const manifest = { version, notes: `Mobile Shop ERP ${version}`, platforms };
+const manifest = { version, notes: policy.notes || `Mobile Shop ERP ${version}`, critical: policy.critical, minimum_version: policy.minimum_version, platforms };
 writeFileSync(join(output, "latest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 process.stdout.write(`Prepared ${copied.size} release assets and ${Object.keys(platforms).length} signed updater targets in ${output}\n`);

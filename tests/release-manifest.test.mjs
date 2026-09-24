@@ -9,6 +9,7 @@ test("release manifest sends every installed package type to its signed update",
   const root = mkdtempSync(join(tmpdir(), "mobile-shop-release-test-"));
   const input = join(root, "input");
   const output = join(root, "output");
+  const policyPath = join(root, "release-policy.json");
   const version = JSON.parse(readFileSync("package.json", "utf8")).version;
   const fixture = {
     "linux-x64": ["AppImage", "deb"],
@@ -17,6 +18,7 @@ test("release manifest sends every installed package type to its signed update",
     "macos-x64": ["app.tar.gz", "dmg"],
   };
   try {
+    writeFileSync(policyPath, JSON.stringify({ version, critical: true, minimum_version: version, notes: "Urgent inventory fix" }));
     for (const [platform, extensions] of Object.entries(fixture)) {
       const directory = join(input, `release-${platform}`);
       mkdirSync(directory, { recursive: true });
@@ -29,10 +31,16 @@ test("release manifest sends every installed package type to its signed update",
         if (extension !== "dmg") writeFileSync(`${path}.sig`, `signature-for-${platform}-${extension}`);
       }
     }
-    const result = spawnSync(process.execPath, ["scripts/create-update-manifest.mjs", input, output], { encoding: "utf8" });
+    const result = spawnSync(process.execPath, ["scripts/create-update-manifest.mjs", input, output], {
+      encoding: "utf8",
+      env: { ...process.env, MOBILE_SHOP_RELEASE_POLICY: policyPath },
+    });
     assert.equal(result.status, 0, result.stderr);
     const manifest = JSON.parse(readFileSync(join(output, "latest.json"), "utf8"));
     assert.equal(manifest.version, version);
+    assert.equal(manifest.critical, true);
+    assert.equal(manifest.minimum_version, version);
+    assert.equal(manifest.notes, "Urgent inventory fix");
     assert.deepEqual(Object.keys(manifest.platforms).sort(), [
       "darwin-aarch64-app", "darwin-x86_64-app", "linux-x86_64-appimage",
       "linux-x86_64-deb", "windows-x86_64-msi", "windows-x86_64-nsis",

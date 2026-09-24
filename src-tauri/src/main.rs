@@ -5,6 +5,11 @@ use tauri::{Manager, State};
 use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
+fn app_version(app: tauri::AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
+#[tauri::command]
 fn api_request(
     store: State<'_, Arc<Store>>,
     method: String,
@@ -31,15 +36,15 @@ fn save_pdf(path: String, bytes: Vec<u8>) -> Result<(), String> {
 async fn check_updates(app: tauri::AppHandle) -> Result<Value, String> {
     let Some(endpoint)=option_env!("MOBILE_SHOP_UPDATE_URL") else {return Ok(serde_json::json!({"configured":false}));};
     let url=endpoint.parse().map_err(|e|format!("Invalid update URL: {e}"))?;
-    let update=app.updater_builder().endpoints(vec![url]).map_err(|e|e.to_string())?.build().map_err(|e|e.to_string())?.check().await.map_err(|e|e.to_string())?;
-    Ok(match update {Some(u)=>serde_json::json!({"configured":true,"available":true,"version":u.version,"notes":u.body}),None=>serde_json::json!({"configured":true,"available":false})})
+    let update=app.updater_builder().endpoints(vec![url]).map_err(|e|e.to_string())?.timeout(std::time::Duration::from_secs(10)).build().map_err(|e|e.to_string())?.check().await.map_err(|e|e.to_string())?;
+    Ok(match update {Some(u)=>serde_json::json!({"configured":true,"available":true,"version":u.version,"current_version":u.current_version,"notes":u.body,"critical":u.raw_json.get("critical").and_then(Value::as_bool).unwrap_or(false),"minimum_version":u.raw_json.get("minimum_version").and_then(Value::as_str)}),None=>serde_json::json!({"configured":true,"available":false})})
 }
 
 #[tauri::command]
 async fn install_update(app: tauri::AppHandle) -> Result<(), String> {
     let endpoint=option_env!("MOBILE_SHOP_UPDATE_URL").ok_or("Updates are not configured")?;
     let url=endpoint.parse().map_err(|e|format!("Invalid update URL: {e}"))?;
-    let update=app.updater_builder().endpoints(vec![url]).map_err(|e|e.to_string())?.build().map_err(|e|e.to_string())?.check().await.map_err(|e|e.to_string())?.ok_or("No update available")?;
+    let update=app.updater_builder().endpoints(vec![url]).map_err(|e|e.to_string())?.timeout(std::time::Duration::from_secs(900)).build().map_err(|e|e.to_string())?.check().await.map_err(|e|e.to_string())?.ok_or("No update available")?;
     update.download_and_install(|_,_|{},||{}).await.map_err(|e|e.to_string())?;
     app.restart();
 }
@@ -62,7 +67,7 @@ fn main() {
             app.manage(store);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![api_request,save_pdf,check_updates,install_update])
+        .invoke_handler(tauri::generate_handler![api_request,save_pdf,app_version,check_updates,install_update])
         .run(tauri::generate_context!())
         .expect("Mobile Shop ERP failed to start");
 }
