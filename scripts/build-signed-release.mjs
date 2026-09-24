@@ -19,10 +19,13 @@ writeFileSync(configPath, JSON.stringify(config));
 try {
   const args = ["run", "tauri", "build", "--", "--ci", "--config", configPath];
   if (process.env.MOBILE_SHOP_BUILD_TARGET) args.push("--target", process.env.MOBILE_SHOP_BUILD_TARGET);
-  const result = spawnSync("npm", args, {
+  const npmCli = process.env.npm_execpath;
+  if (!npmCli) throw new Error("Run this script with npm run release:signed");
+  const result = spawnSync(process.execPath, [npmCli, ...args], {
     stdio: "inherit",
     env: { ...process.env, TAURI_SIGNING_PRIVATE_KEY: privateKey, TAURI_SIGNING_PRIVATE_KEY_PASSWORD: process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? "", MOBILE_SHOP_UPDATE_PUBLIC_KEY: publicKey, MOBILE_SHOP_UPDATE_URL: endpoint },
   });
+  if (result.error) throw result.error;
   if (result.status !== 0) process.exitCode = result.status ?? 1;
 } finally {
   rmSync(temp, { recursive: true, force: true });
