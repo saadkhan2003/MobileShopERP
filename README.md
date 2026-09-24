@@ -25,9 +25,9 @@ npm run tauri -- build --bundles deb
 
 The resulting `.deb` is in `src-tauri/target/release/bundle/deb/`. Launch the installed app from the desktop menu. On first launch, create the owner account with a password of at least eight characters. Shop data is stored by Tauri in the operating system's application data directory under `com.mobileshop.erp`.
 
-The signed Linux packages are available on [GitHub Releases](https://github.com/saadkhan2003/mobile-shop-erp-releases/releases/latest). Use the AppImage if you want in-app signed updates; the `.deb` is for manual installation.
+Signed desktop packages are published in this repository's [GitHub Releases](https://github.com/saadkhan2003/MobileShopERP/releases/latest). Each installed package type checks the matching signed updater asset: AppImage or Debian package on Linux, NSIS setup `.exe` or MSI on Windows, and the application bundle on macOS. macOS users download a `.dmg`; its updater installs the signed `.app.tar.gz` built from that app.
 
-The [desktop build workflow](.github/workflows/desktop-builds.yml) runs the tests, then builds Linux `.deb` and `.AppImage`, a Windows NSIS setup `.exe`, and macOS `.dmg` files for Apple Silicon and Intel. Download CI builds from the workflow run's artifacts. These CI artifacts are build checks and are not OS certificate signed or configured for in-app updates; signed updater releases are produced with the separate [release process](docs/RELEASE.md).
+The [desktop build workflow](.github/workflows/desktop-builds.yml) runs the tests, then builds Linux `.deb` and `.AppImage`, Windows NSIS `.exe` and MSI, and macOS `.dmg` files for Apple Silicon and Intel. Download CI builds from the workflow run's artifacts. These CI artifacts are build checks and are not configured for in-app updates; signed updater releases are produced with the [release workflow](.github/workflows/publish-desktop-release.yml) described in the [release process](docs/RELEASE.md).
 
 ## Shop workflows
 

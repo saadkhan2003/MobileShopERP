@@ -1,0 +1,120 @@
+name: Publish signed desktop release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate release version and tests
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+      - name: Match tag to application version
+        run: test "$GITHUB_REF_NAME" = "v$(node -p 'require("./package.json").version')"
+      - run: npm ci
+      - run: npm test
+
+  build:
+    name: Signed ${{ matrix.artifact }}
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            artifact: linux-x64
+            target: ''
+            paths: |
+              src-tauri/target/release/bundle/deb/*.deb*
+              src-tauri/target/release/bundle/appimage/*.AppImage*
+          - os: windows-latest
+            artifact: windows-x64
+            target: ''
+            paths: |
+              src-tauri/target/release/bundle/nsis/*.exe*
+              src-tauri/target/release/bundle/msi/*.msi*
+          - os: macos-latest
+            artifact: macos-arm64
+            target: aarch64-apple-darwin
+            paths: |
+              src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+              src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app.tar.gz*
+          - os: macos-latest
+            artifact: macos-x64
+            target: x86_64-apple-darwin
+            paths: |
+              src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+              src-tauri/target/x86_64-apple-darwin/release/bundle/macos/*.app.tar.gz*
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libssl-dev libfuse2
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - run: npm ci
+      - name: Build signed updater packages and installers
+        env:
+          MOBILE_SHOP_UPDATE_URL: https://github.com/saadkhan2003/MobileShopERP/releases/latest/download/latest.json
+          MOBILE_SHOP_UPDATE_PRIVATE_KEY: ${{ secrets.MOBILE_SHOP_UPDATE_PRIVATE_KEY }}
+          MOBILE_SHOP_UPDATE_PUBLIC_KEY: ${{ secrets.MOBILE_SHOP_UPDATE_PUBLIC_KEY }}
+          MOBILE_SHOP_BUILD_TARGET: ${{ matrix.target }}
+          APPLE_SIGNING_IDENTITY: ${{ runner.os == 'macOS' && '-' || '' }}
+        run: npm run release:signed
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-${{ matrix.artifact }}
+          path: ${{ matrix.paths }}
+          if-no-files-found: error
+          compression-level: 0
+
+  publish:
+    name: Publish GitHub Release and updater manifest
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v6
+        with:
+          pattern: release-*
+          path: release-input
+      - name: Build six-target signed updater manifest
+        env:
+          MOBILE_SHOP_RELEASE_REPOSITORY: ${{ github.repository }}
+        run: node scripts/create-update-manifest.mjs release-input release-output
+      - name: Publish packages to this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release-output/* --verify-tag --title "Mobile Shop ERP ${GITHUB_REF_NAME#v}" --generate-notes
+      - name: Verify published manifest
+        run: |
+          curl --fail --location --silent --show-error "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/latest.json" \
+            | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{const m=JSON.parse(s);if(Object.keys(m.platforms).length!==6)process.exit(1);console.log(m.version,Object.keys(m.platforms).join(", "))})'

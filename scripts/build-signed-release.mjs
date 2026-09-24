@@ -3,14 +3,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const endpoint = process.env.MOBILE_SHOP_UPDATE_URL;
-const privatePath = process.env.TAURI_SIGNING_PRIVATE_KEY_PATH;
-const publicPath = process.env.MOBILE_SHOP_UPDATE_PUBLIC_KEY_PATH;
-if (!endpoint?.startsWith("https://") || !privatePath || !publicPath) {
-  throw new Error("Set MOBILE_SHOP_UPDATE_URL (HTTPS), TAURI_SIGNING_PRIVATE_KEY_PATH, and MOBILE_SHOP_UPDATE_PUBLIC_KEY_PATH");
-}
-const publicKey = readFileSync(publicPath, "utf8").trim();
-const privateKey = readFileSync(privatePath, "utf8").trim();
+const endpoint = process.env.MOBILE_SHOP_UPDATE_URL || "https://github.com/saadkhan2003/MobileShopERP/releases/latest/download/latest.json";
+const privateKey = (process.env.MOBILE_SHOP_UPDATE_PRIVATE_KEY || (process.env.TAURI_SIGNING_PRIVATE_KEY_PATH && readFileSync(process.env.TAURI_SIGNING_PRIVATE_KEY_PATH, "utf8")) || "").trim();
+const publicKey = (process.env.MOBILE_SHOP_UPDATE_PUBLIC_KEY || (process.env.MOBILE_SHOP_UPDATE_PUBLIC_KEY_PATH && readFileSync(process.env.MOBILE_SHOP_UPDATE_PUBLIC_KEY_PATH, "utf8")) || "").trim();
+if (!endpoint.startsWith("https://")) throw new Error("MOBILE_SHOP_UPDATE_URL must be HTTPS");
 if (!publicKey || !privateKey) throw new Error("Signing keys are empty");
 const bundles = process.platform === "linux" ? ["deb", "appimage"] : process.platform === "darwin" ? ["app", "dmg"] : ["msi", "nsis"];
 const config = {
@@ -21,7 +17,9 @@ const temp = mkdtempSync(join(tmpdir(), "mobile-shop-release-"));
 const configPath = join(temp, "tauri-release.json");
 writeFileSync(configPath, JSON.stringify(config));
 try {
-  const result = spawnSync("npm", ["run", "tauri", "build", "--", "--config", configPath], {
+  const args = ["run", "tauri", "build", "--", "--ci", "--config", configPath];
+  if (process.env.MOBILE_SHOP_BUILD_TARGET) args.push("--target", process.env.MOBILE_SHOP_BUILD_TARGET);
+  const result = spawnSync("npm", args, {
     stdio: "inherit",
     env: { ...process.env, TAURI_SIGNING_PRIVATE_KEY: privateKey, TAURI_SIGNING_PRIVATE_KEY_PASSWORD: process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? "", MOBILE_SHOP_UPDATE_PUBLIC_KEY: publicKey, MOBILE_SHOP_UPDATE_URL: endpoint },
   });

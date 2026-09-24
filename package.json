@@ -1,6 +1,6 @@
 {
   "name": "mobile-shop-erp-desktop",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "release:manifest": "node scripts/create-update-manifest.mjs",
     "test:backend": "cargo test --manifest-path rust/Cargo.toml",
     "test:ui": "vitest run",
-    "test": "npm run test:ui && npm run test:backend"
+    "test": "npm run test:ui && node --test tests/release-manifest.test.mjs && npm run test:backend"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

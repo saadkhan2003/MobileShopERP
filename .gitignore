@@ -30,3 +30,5 @@ coverage/
 *.msi
 *.sig
 release/latest.json
+release-input/
+release-output/
