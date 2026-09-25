@@ -33,3 +33,4 @@ INSERT OR IGNORE INTO branches(id,name) VALUES(1,'Main branch');
 CREATE INDEX IF NOT EXISTS idx_phones_status ON phones(status);
 CREATE INDEX IF NOT EXISTS idx_sales_date ON sales(date);
 CREATE INDEX IF NOT EXISTS idx_payments_contact ON payments(contact_id);
+CREATE TABLE IF NOT EXISTS recovery_keys(id INTEGER PRIMARY KEY CHECK(id=1), recovery_key_hash TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP);

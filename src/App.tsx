@@ -1053,6 +1053,105 @@ function App() {
   const [vendorModalOpen, setVendorModalOpen] = useState(false);
   const [copiedResetCmd, setCopiedResetCmd] = useState(false);
   const [showAuthPassword, setShowAuthPassword] = useState(false);
+  const [recoveryForm, setRecoveryForm] = useState({
+    username: "",
+    recovery_key: "",
+    new_password: "",
+    confirm_password: "",
+  });
+  const [recoveryError, setRecoveryError] = useState("");
+  const [recoverySuccess, setRecoverySuccess] = useState("");
+  const [recoveryBusy, setRecoveryBusy] = useState(false);
+  const [showRecoveryPass, setShowRecoveryPass] = useState(false);
+  const [showCliGuide, setShowCliGuide] = useState(false);
+
+  const [pinForm, setPinForm] = useState({ pin: "", confirm: "" });
+  const [pinSuccess, setPinSuccess] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [pinBusy, setPinBusy] = useState(false);
+
+  const handleInAppReset = async (e: FormEvent) => {
+    e.preventDefault();
+    setRecoveryError("");
+    setRecoverySuccess("");
+    if (!recoveryForm.username.trim()) {
+      setRecoveryError("Please enter your Store Owner username.");
+      return;
+    }
+    if (!recoveryForm.recovery_key.trim()) {
+      setRecoveryError("Please enter your Master Recovery PIN.");
+      return;
+    }
+    if (recoveryForm.new_password.length < 8) {
+      setRecoveryError("New password must be at least 8 characters long.");
+      return;
+    }
+    if (recoveryForm.new_password !== recoveryForm.confirm_password) {
+      setRecoveryError("New passwords do not match.");
+      return;
+    }
+    setRecoveryBusy(true);
+    try {
+      await api("POST", "reset-password", {
+        username: recoveryForm.username.trim(),
+        recovery_key: recoveryForm.recovery_key.trim(),
+        new_password: recoveryForm.new_password,
+      });
+      setRecoverySuccess("Password reset successfully! You can now sign in.");
+      setForm((prev) => ({
+        ...prev,
+        username: recoveryForm.username.trim(),
+        password: "",
+      }));
+      setTimeout(() => {
+        setForgotModalOpen(false);
+        setRecoverySuccess("");
+        setRecoveryForm({
+          username: "",
+          recovery_key: "",
+          new_password: "",
+          confirm_password: "",
+        });
+      }, 1600);
+    } catch (err: unknown) {
+      setRecoveryError(
+        typeof err === "string"
+          ? err
+          : (err as Error)?.message || "Failed to reset password. Check your recovery PIN.",
+      );
+    } finally {
+      setRecoveryBusy(false);
+    }
+  };
+
+  const handleUpdateRecoveryPin = async (e: FormEvent) => {
+    e.preventDefault();
+    setPinError("");
+    setPinSuccess("");
+    if (pinForm.pin.length < 4) {
+      setPinError("Recovery PIN must be at least 4 characters.");
+      return;
+    }
+    if (pinForm.pin !== pinForm.confirm) {
+      setPinError("PIN confirmation does not match.");
+      return;
+    }
+    setPinBusy(true);
+    try {
+      await request("POST", "recovery-pin", { recovery_pin: pinForm.pin });
+      setPinSuccess("Master Recovery PIN updated successfully!");
+      setPinForm({ pin: "", confirm: "" });
+      setTimeout(() => setPinSuccess(""), 4000);
+    } catch (err: unknown) {
+      setPinError(
+        typeof err === "string"
+          ? err
+          : (err as Error)?.message || "Failed to update recovery PIN.",
+      );
+    } finally {
+      setPinBusy(false);
+    }
+  };
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
     new_password: "",
@@ -1413,7 +1512,17 @@ function App() {
         {status === "login" && (
           <button
             type="button"
-            onClick={() => setForgotModalOpen(true)}
+            onClick={() => {
+              setForgotModalOpen(true);
+              setRecoveryForm({
+                username: form.username ? String(form.username) : "admin",
+                recovery_key: "",
+                new_password: "",
+                confirm_password: "",
+              });
+              setRecoveryError("");
+              setRecoverySuccess("");
+            }}
             className="mt-4 w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-3 shadow-[0_1px_4px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-50 transition-colors text-left cursor-pointer"
           >
             <KeyRound className="size-6 text-zinc-600 ml-1 shrink-0" />
@@ -1437,7 +1546,17 @@ function App() {
           <div className="flex items-center gap-6">
             <button
               type="button"
-              onClick={() => setForgotModalOpen(true)}
+              onClick={() => {
+                setForgotModalOpen(true);
+                setRecoveryForm({
+                  username: form.username ? String(form.username) : "admin",
+                  recovery_key: "",
+                  new_password: "",
+                  confirm_password: "",
+                });
+                setRecoveryError("");
+                setRecoverySuccess("");
+              }}
               className="hover:text-zinc-900 hover:underline cursor-pointer"
             >
               Can&apos;t access your account?
@@ -1449,7 +1568,7 @@ function App() {
 
         {forgotModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-            <div className="w-full max-w-md rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
+            <div className="w-full max-w-md rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900 max-h-[92vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
                 <div className="flex items-center gap-2 font-semibold text-base text-zinc-900">
                   <KeyRound className="size-5 text-zinc-900" />
@@ -1467,7 +1586,7 @@ function App() {
 
               <div className="space-y-3 text-xs leading-relaxed">
                 {/* Staff recovery box */}
-                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-1">
+                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1">
                   <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
                     <Users className="size-4 text-zinc-700 shrink-0" />
                     <span>Staff Accounts (Cashier, Technician, Salesman)</span>
@@ -1477,43 +1596,130 @@ function App() {
                   </p>
                 </div>
 
-                {/* Owner recovery box */}
-                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-2">
+                {/* Owner in-app recovery form */}
+                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-2.5">
                   <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
                     <ShieldCheck className="size-4 text-zinc-700 shrink-0" />
-                    <span>Store Owner / Administrator Recovery</span>
+                    <span>Store Owner Reset (In-App with Master PIN)</span>
                   </div>
-                  <p className="text-xs text-zinc-600 leading-relaxed pl-6">
-                    Since Mobile Shop ERP is an offline local desktop system without cloud tracking, you can reset your owner credentials securely right in your terminal:
+                  <p className="text-xs text-zinc-600 leading-relaxed">
+                    Reset your store owner password right here without any terminal or cargo tools. Enter your username, Master Recovery PIN (default is <strong className="text-zinc-800 font-semibold">123456</strong>), and new password:
                   </p>
-                  <div className="ml-6 space-y-2 pt-1">
-                    <div className="flex items-center justify-between gap-2 rounded-xs bg-zinc-950 px-3 py-2 font-mono text-[11px] text-zinc-100 shadow-inner">
-                      <span className="truncate">npm run reset-password</span>
+
+                  <form onSubmit={handleInAppReset} className="space-y-2.5 pt-1">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-medium text-zinc-700 block">Owner Username</label>
+                        <Input
+                          required
+                          value={recoveryForm.username}
+                          onChange={(e) => setRecoveryForm((f) => ({ ...f, username: e.target.value }))}
+                          placeholder="e.g. admin"
+                          className="h-8 text-xs bg-white border-zinc-300"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-medium text-zinc-700 block">Master Recovery PIN</label>
+                        <Input
+                          required
+                          type="password"
+                          value={recoveryForm.recovery_key}
+                          onChange={(e) => setRecoveryForm((f) => ({ ...f, recovery_key: e.target.value }))}
+                          placeholder="Default: 123456"
+                          className="h-8 text-xs bg-white border-zinc-300"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-medium text-zinc-700 block">New Password</label>
+                        <div className="relative">
+                          <Input
+                            required
+                            type={showRecoveryPass ? "text" : "password"}
+                            value={recoveryForm.new_password}
+                            onChange={(e) => setRecoveryForm((f) => ({ ...f, new_password: e.target.value }))}
+                            placeholder="Min 8 chars"
+                            className="h-8 text-xs bg-white border-zinc-300 pr-7"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRecoveryPass(!showRecoveryPass)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 cursor-pointer"
+                          >
+                            {showRecoveryPass ? <EyeOff size={13} /> : <Eye size={13} />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-medium text-zinc-700 block">Confirm Password</label>
+                        <Input
+                          required
+                          type={showRecoveryPass ? "text" : "password"}
+                          value={recoveryForm.confirm_password}
+                          onChange={(e) => setRecoveryForm((f) => ({ ...f, confirm_password: e.target.value }))}
+                          placeholder="Re-type password"
+                          className="h-8 text-xs bg-white border-zinc-300"
+                        />
+                      </div>
+                    </div>
+
+                    {recoveryError && (
+                      <div role="alert" className="text-xs text-red-600 font-medium pt-0.5">
+                        {recoveryError}
+                      </div>
+                    )}
+
+                    {recoverySuccess && (
+                      <div role="status" className="text-xs text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 rounded-xs p-2">
+                        {recoverySuccess}
+                      </div>
+                    )}
+
+                    <div className="pt-1.5 flex items-center justify-between">
                       <button
                         type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText("npm run reset-password");
-                          setCopiedResetCmd(true);
-                          setTimeout(() => setCopiedResetCmd(false), 2000);
-                        }}
-                        className="shrink-0 text-emerald-400 hover:text-emerald-300 font-sans text-xs font-medium underline cursor-pointer"
+                        onClick={() => setShowCliGuide(!showCliGuide)}
+                        className="text-[11px] text-zinc-500 hover:text-zinc-800 underline cursor-pointer"
                       >
-                        {copiedResetCmd ? "Copied!" : "Copy"}
+                        {showCliGuide ? "Hide developer CLI" : "Developer CLI tools"}
                       </button>
+                      <Button
+                        type="submit"
+                        disabled={recoveryBusy}
+                        className="h-8 px-4 bg-black hover:bg-zinc-800 text-white font-normal text-xs rounded-xs shadow-xs cursor-pointer flex items-center gap-1.5"
+                      >
+                        {recoveryBusy ? <Loader2 className="size-3.5 animate-spin" /> : <span>Reset Password</span>}
+                      </Button>
                     </div>
-                    <p className="text-[11px] text-zinc-500">
-                      Default credentials: username <strong className="text-zinc-800 font-medium">admin</strong> / password <strong className="text-zinc-800 font-medium">admin1234</strong>.
-                    </p>
-                    <p className="text-[11px] text-zinc-500">
-                      Or specify custom credentials:
-                    </p>
-                    <div className="rounded-xs bg-zinc-950 px-3 py-1.5 font-mono text-[11px] text-zinc-200 shadow-inner">
-                      cargo run --bin reset_password -- {form.username ? String(form.username) : "admin"} &lt;new_password&gt;
+                  </form>
+
+                  {showCliGuide && (
+                    <div className="mt-2 pt-2 border-t border-zinc-200 space-y-2 animate-in fade-in duration-100">
+                      <div className="flex items-center justify-between gap-2 rounded-xs bg-zinc-950 px-3 py-1.5 font-mono text-[10px] text-zinc-100 shadow-inner">
+                        <span className="truncate">npm run reset-password</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText("npm run reset-password");
+                            setCopiedResetCmd(true);
+                            setTimeout(() => setCopiedResetCmd(false), 2000);
+                          }}
+                          className="shrink-0 text-emerald-400 hover:text-emerald-300 font-sans text-xs underline cursor-pointer"
+                        >
+                          {copiedResetCmd ? "Copied!" : "Copy"}
+                        </button>
+                      </div>
+                      <div className="rounded-xs bg-zinc-950 px-3 py-1.5 font-mono text-[10px] text-zinc-200 shadow-inner">
+                        cargo run --bin reset_password -- {recoveryForm.username || "admin"} &lt;new_password&gt;
+                      </div>
                     </div>
-                    <p className="text-[11px] text-zinc-500 pt-1.5 border-t border-zinc-200">
-                      Need technical help? Contact <strong className="text-zinc-800 font-medium">Stack and Scale</strong> enterprise support.
-                    </p>
-                  </div>
+                  )}
+
+                  <p className="text-[11px] text-zinc-500 pt-1 border-t border-zinc-200">
+                    Need technical help? Contact <strong className="text-zinc-800 font-medium">Stack and Scale</strong> enterprise support.
+                  </p>
                 </div>
               </div>
 
@@ -2262,6 +2468,59 @@ function App() {
             <>
               <GlobalSettings settings={settings} save={saveSettings} />
               <UpdatePanel />
+              {user?.role === "owner" && (
+                <Card className="mt-5 border-border/60">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <KeyRound size={16} className="text-primary" />
+                          Store Owner Master Recovery PIN
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Used to reset your owner password directly on the sign-in screen without terminal or developer tools. Default PIN is <strong className="text-foreground">123456</strong>.
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-slate-500/10 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        Owner Only
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleUpdateRecoveryPin} className="space-y-4 max-w-md">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-foreground">New Master PIN</label>
+                          <Input
+                            required
+                            type="password"
+                            value={pinForm.pin}
+                            onChange={(e) => setPinForm((f) => ({ ...f, pin: e.target.value }))}
+                            placeholder="Min 4 chars"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-foreground">Confirm PIN</label>
+                          <Input
+                            required
+                            type="password"
+                            value={pinForm.confirm}
+                            onChange={(e) => setPinForm((f) => ({ ...f, confirm: e.target.value }))}
+                            placeholder="Confirm PIN"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                      </div>
+                      {pinError && <p role="alert" className="text-xs text-red-600 font-medium">{pinError}</p>}
+                      {pinSuccess && <p role="status" className="text-xs text-emerald-600 font-medium">{pinSuccess}</p>}
+                      <Button type="submit" disabled={pinBusy} size="sm">
+                        {pinBusy ? "Updating…" : "Update Master Recovery PIN"}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
               <Card className="mt-5 border-border/60">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">

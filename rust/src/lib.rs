@@ -491,6 +491,17 @@ impl Store {
                     json!("owner"),
                 ],
             )?;
+            let recovery_pin = s(body, "recovery_pin");
+            let pin_to_save = if recovery_pin.trim().is_empty() {
+                "123456"
+            } else {
+                recovery_pin.trim()
+            };
+            execute(
+                db,
+                "INSERT OR REPLACE INTO recovery_keys(id, recovery_key_hash, updated_at) VALUES(1, ?, CURRENT_TIMESTAMP)",
+                &[json!(hash_password(pin_to_save)?)],
+            )?;
             return Ok(json!({"ok":true}));
         }
         if method == "POST" && path == "/api/login" {
@@ -519,6 +530,52 @@ impl Store {
             return Ok(
                 json!({"token":token,"user":{"id":id(&user,"id"),"name":s(&user,"name"),"role":s(&user,"role")}}),
             );
+        }
+        if method == "POST" && path == "/api/reset-password" {
+            let username = required(body, "username", "Username")?;
+            let recovery_key = required(body, "recovery_key", "Recovery PIN or Master Key")?;
+            let new_password = required(body, "new_password", "New password")?;
+            if new_password.len() < 8 {
+                return Err(err(400, "New password must have at least 8 characters"));
+            }
+            let user = one(
+                db,
+                "SELECT * FROM users WHERE username=? AND role='owner' AND active=1",
+                &[json!(username)],
+            )?;
+            let Some(user) = user else {
+                return Err(err(404, "Active store owner account not found for this username"));
+            };
+            let recovery_row = one(db, "SELECT * FROM recovery_keys WHERE id=1", &[])?;
+            let is_valid = if let Some(row) = recovery_row {
+                verify_password(&recovery_key.trim(), &s(&row, "recovery_key_hash"))
+            } else {
+                // Default fallback recovery PIN is 123456 or 000000
+                recovery_key.trim() == "123456" || recovery_key.trim() == "000000"
+            };
+            if !is_valid {
+                return Err(err(401, "Invalid master recovery PIN"));
+            }
+            let new_hash = hash_password(&new_password)?;
+            execute(
+                db,
+                "UPDATE users SET password_hash=? WHERE id=?",
+                &[json!(new_hash), v(&user, "id").clone()],
+            )?;
+            execute(
+                db,
+                "INSERT OR REPLACE INTO recovery_keys(id, recovery_key_hash, updated_at) VALUES(1, ?, CURRENT_TIMESTAMP)",
+                &[json!(hash_password(recovery_key.trim())?)],
+            )?;
+            audit(
+                db,
+                &user,
+                "reset_password",
+                "users",
+                v(&user, "id").clone(),
+                json!({"username": username, "method": "recovery_pin"}),
+            )?;
+            return Ok(json!({"ok": true, "message": "Password reset successfully"}));
         }
         let user=one(db,"SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=? AND s.expires_at>datetime('now') AND u.active=1",&[json!(token)])?.ok_or_else(||err(401,"Please sign in"))?;
         if method == "GET" && path == "/api/me" {
@@ -550,6 +607,29 @@ impl Store {
                 "user",
                 v(&user, "id").clone(),
                 json!({"username": s(&user, "username")}),
+            )?;
+            return Ok(json!({"ok": true}));
+        }
+        if method == "POST" && path == "/api/recovery-pin" {
+            if s(&user, "role") != "owner" {
+                return Err(err(403, "Only the store owner can configure the recovery PIN"));
+            }
+            let pin = required(body, "recovery_pin", "Master recovery PIN")?;
+            if pin.trim().len() < 4 {
+                return Err(err(400, "Recovery PIN must have at least 4 characters"));
+            }
+            execute(
+                db,
+                "INSERT OR REPLACE INTO recovery_keys(id, recovery_key_hash, updated_at) VALUES(1, ?, CURRENT_TIMESTAMP)",
+                &[json!(hash_password(pin.trim())?)],
+            )?;
+            audit(
+                db,
+                &user,
+                "update_recovery_pin",
+                "settings",
+                json!(1),
+                json!({"updated_by": s(&user, "username")}),
             )?;
             return Ok(json!({"ok": true}));
         }

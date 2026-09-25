@@ -140,3 +140,70 @@ fn duplicate_imei_returns_clear_error(){
     assert!(err.to_string().contains("already exists"), "expected duplicate IMEI error, got {err}");
 }
 
+#[test]
+fn owner_can_reset_password_with_recovery_pin() {
+    let dir = std::env::temp_dir().join(format!("shop-rec-{}-{}", std::process::id(), rand::random::<u64>()));
+    let store = Store::open(dir.clone()).unwrap();
+
+    // 1. Initial setup with recovery_pin
+    call(&store, "", "POST", "/api/setup", json!({
+        "name": "Shop Owner",
+        "username": "admin",
+        "password": "InitialPassword123",
+        "recovery_pin": "889900"
+    }));
+
+    // 2. Attempt reset with wrong recovery PIN
+    let err = store.handle("POST", "/api/reset-password", &json!({
+        "username": "admin",
+        "recovery_key": "wrong_pin",
+        "new_password": "NewSecretPassword123"
+    }), "").unwrap_err();
+    assert_eq!(err.status, 401);
+
+    // 3. Attempt reset with short password
+    let err = store.handle("POST", "/api/reset-password", &json!({
+        "username": "admin",
+        "recovery_key": "889900",
+        "new_password": "short"
+    }), "").unwrap_err();
+    assert_eq!(err.status, 400);
+
+    // 4. Successful password reset with recovery PIN
+    let res = call(&store, "", "POST", "/api/reset-password", json!({
+        "username": "admin",
+        "recovery_key": "889900",
+        "new_password": "NewSecretPassword123"
+    }));
+    assert_eq!(res["ok"], true);
+
+    // 5. Old password no longer works
+    let err = store.handle("POST", "/api/login", &json!({
+        "username": "admin",
+        "password": "InitialPassword123"
+    }), "").unwrap_err();
+    assert_eq!(err.status, 401);
+
+    // 6. New password works
+    let login = call(&store, "", "POST", "/api/login", json!({
+        "username": "admin",
+        "password": "NewSecretPassword123"
+    }));
+    let token = login["token"].as_str().unwrap();
+
+    // 7. Update recovery PIN inside session
+    let updated = call(&store, token, "POST", "/api/recovery-pin", json!({
+        "recovery_pin": "556677"
+    }));
+    assert_eq!(updated["ok"], true);
+
+    // 8. Reset password again with updated PIN
+    let res2 = call(&store, "", "POST", "/api/reset-password", json!({
+        "username": "admin",
+        "recovery_key": "556677",
+        "new_password": "SecondNewPassword123"
+    }));
+    assert_eq!(res2["ok"], true);
+
+    let _ = std::fs::remove_dir_all(dir);
+}
