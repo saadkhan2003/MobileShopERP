@@ -952,18 +952,11 @@ function VendorInfoModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
       <div className="w-full max-w-lg rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <div className="flex items-center gap-3">
-            <img
-              src="/stack-and-scale-icon.png"
-              alt="Stack & Scale"
-              className="size-9 object-contain"
-            />
-            <div>
-              <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack &amp; Scale</h3>
-              <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-                Sovereign Software &amp; Enterprise Systems
-              </p>
-            </div>
+          <div>
+            <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack &amp; Scale</h3>
+            <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
+              Sovereign Software &amp; Enterprise Systems
+            </p>
           </div>
           <button
             type="button"
@@ -976,13 +969,13 @@ function VendorInfoModal({
         </div>
 
         <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed max-h-[75vh] overflow-y-auto pr-1">
-          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-4 flex flex-col items-center justify-center text-center gap-2">
+          <div className="rounded-xs bg-zinc-50/80 border border-zinc-200 p-6 flex flex-col items-center justify-center text-center gap-3">
             <img
               src="/stack-and-scale-logo.png"
               alt="Stack & Scale - Sovereign Software & Enterprise Systems"
-              className="h-9 object-contain"
+              className="h-16 sm:h-20 w-auto max-w-full object-contain drop-shadow-xs"
             />
-            <p className="text-[11px] text-zinc-500 font-normal">
+            <p className="text-xs text-zinc-500 font-normal max-w-sm">
               Software built for store floors, warehouses, and real operations.
             </p>
           </div>
