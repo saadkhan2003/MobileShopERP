@@ -1289,10 +1289,10 @@ function App() {
       <aside
         data-testid="shop-sidebar"
         data-collapsed={sidebarCollapsed}
-        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border/60 bg-sidebar/95 backdrop-blur-md text-sidebar-foreground transition-all duration-200 ${sidebarCollapsed ? "w-16" : "w-64"}`}
+        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground transition-all duration-200 ${sidebarCollapsed ? "w-16" : "w-64"}`}
       >
         <div className={`flex h-14 shrink-0 items-center gap-3 border-b border-border/40 ${sidebarCollapsed ? "px-3.5 justify-center" : "px-4"}`}>
-          <ShopLogo settings={settings} className="size-8.5 rounded-xl shadow-xs ring-1 ring-emerald-500/30" />
+          <ShopLogo settings={settings} className="size-8 rounded-lg shadow-xs ring-1 ring-emerald-500/30" />
           <div className={`min-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 ${sidebarCollapsed ? "max-w-0 opacity-0" : "max-w-full opacity-100"}`} aria-hidden={sidebarCollapsed}>
             <div className="text-sm font-bold tracking-tight text-foreground truncate">{settings.shop_name}</div>
             <div className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 truncate flex items-center gap-1.5">
