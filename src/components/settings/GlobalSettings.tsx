@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import defaultShopLogo from "../../assets/stack-and-scale-icon.png";
+import defaultShopLogo from "../../assets/mobile-shop-icon.png";
 
 export type ShopSettings = {
   shop_name: string;
@@ -47,7 +47,7 @@ export function ShopLogo({
       {settings.logo_data ? (
         <img src={settings.logo_data} alt="Shop logo" className="size-full object-contain bg-white" />
       ) : (
-        <img src={defaultShopLogo} alt={settings.shop_name || "Mobile Shop ERP"} className="size-full object-contain p-0.5" />
+        <img src={defaultShopLogo} alt={settings.shop_name || "Mobile Shop ERP"} className="size-full object-cover" />
       )}
     </div>
   );
