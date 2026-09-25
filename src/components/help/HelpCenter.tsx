@@ -31,6 +31,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import stackAndScaleLogo from "../../assets/stack-and-scale-logo.png";
+import stackAndScaleLogoDark from "../../assets/stack-and-scale-logo-dark.png";
 
 interface Topic {
   id: string;
@@ -953,12 +955,12 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
           <div className="space-y-4 text-sm leading-relaxed">
             <div className="rounded-lg border bg-white dark:bg-zinc-950 p-4 flex items-center justify-center shadow-xs">
               <img
-                src="/stack-and-scale-logo.png"
+                src={stackAndScaleLogo}
                 alt="Stack & Scale - Sovereign Software & Enterprise Systems"
                 className="h-10 object-contain dark:hidden"
               />
               <img
-                src="/stack-and-scale-logo-dark.png"
+                src={stackAndScaleLogoDark}
                 alt="Stack & Scale - Sovereign Software & Enterprise Systems"
                 className="h-10 object-contain hidden dark:block"
               />

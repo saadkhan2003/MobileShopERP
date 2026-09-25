@@ -48,6 +48,8 @@ import {
   X,
 } from "lucide-react";
 import { HelpCenter } from "./components/help/HelpCenter";
+import stackAndScaleLogo from "./assets/stack-and-scale-logo.png";
+import stackAndScaleIcon from "./assets/stack-and-scale-icon.png";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { PageHeader } from "./components/ui/page-header";
@@ -971,7 +973,7 @@ function VendorInfoModal({
         <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed max-h-[75vh] overflow-y-auto pr-1">
           <div className="rounded-xs bg-zinc-50/80 border border-zinc-200 p-6 flex flex-col items-center justify-center text-center gap-3">
             <img
-              src="/stack-and-scale-logo.png"
+              src={stackAndScaleLogo}
               alt="Stack & Scale - Sovereign Software & Enterprise Systems"
               className="h-10 sm:h-12 w-auto max-w-[85%] object-contain"
             />
@@ -1539,7 +1541,7 @@ function App() {
           <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
             <div className="flex items-center gap-2">
               <img
-                src="/stack-and-scale-icon.png"
+                src={stackAndScaleIcon}
                 alt="Stack & Scale"
                 className="size-3.5 object-contain"
               />
@@ -1581,7 +1583,7 @@ function App() {
         <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-between text-[12px] text-zinc-500 pointer-events-auto">
           <div className="flex items-center gap-2.5">
             <img
-              src="/stack-and-scale-icon.png"
+              src={stackAndScaleIcon}
               alt="Stack & Scale"
               className="h-4 w-auto object-contain"
             />
@@ -1958,7 +1960,7 @@ function App() {
             <div className="flex items-center justify-between">
               <span className="font-semibold text-[11px] text-foreground flex items-center gap-2">
                 <img
-                  src="/stack-and-scale-icon.png"
+                  src={stackAndScaleIcon}
                   alt="Stack & Scale"
                   className="size-3.5 object-contain"
                 />
@@ -1986,7 +1988,7 @@ function App() {
               className="p-1 rounded-sm hover:bg-muted/60 transition-colors cursor-pointer"
             >
               <img
-                src="/stack-and-scale-icon.png"
+                src={stackAndScaleIcon}
                 alt="Stack & Scale"
                 className="size-4 object-contain"
               />
@@ -2588,7 +2590,7 @@ function App() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <img
-                        src="/stack-and-scale-icon.png"
+                        src={stackAndScaleIcon}
                         alt="Stack & Scale"
                         className="size-8 object-contain"
                       />
