@@ -19,6 +19,8 @@ import {
   ChevronDown,
   CircleDollarSign,
   ClipboardList,
+  Eye,
+  EyeOff,
   FileClock,
   HardDrive,
   HelpCircle,
@@ -26,6 +28,7 @@ import {
   KeyRound,
   LayoutDashboard,
   Loader2,
+  Lock,
   LogOut,
   PackagePlus,
   PanelLeft,
@@ -964,6 +967,7 @@ function App() {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [copiedResetCmd, setCopiedResetCmd] = useState(false);
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
     new_password: "",
@@ -1191,99 +1195,149 @@ function App() {
     );
   if (status !== "ready")
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/40 p-6">
-        <Card className="w-full max-w-sm shadow-sm border border-border">
-          <CardHeader className="text-center pb-2">
-            <ShopLogo settings={settings} className="mx-auto mb-2 size-12 rounded-xl shadow-xs ring-1 ring-border" />
-            <CardTitle className="text-xl font-bold tracking-tight">{settings.shop_name}</CardTitle>
-            {settings.tagline && <p className="text-xs text-muted-foreground">{settings.tagline}</p>}
-            <p className="text-xs text-muted-foreground mt-1">
-              {status === "setup"
-                ? "Create the local owner account"
-                : "Sign in to your desktop shop"}
-            </p>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <form onSubmit={submitAuth} className="space-y-3.5">
-              {status === "setup" && (
-                <div>
-                  <Label htmlFor="owner-name">Name</Label>
-                  <Input
-                    id="owner-name"
-                    required
-                    value={text(form.name ?? "")}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  />
-                </div>
-              )}
-              <div>
-                <Label htmlFor="auth-username">Username</Label>
+      <div className="relative flex min-h-screen w-full flex-col justify-center items-center bg-[#f3f4f6] dark:bg-[#1f1f1f] p-4 text-foreground selection:bg-emerald-500/20">
+        {/* Main Microsoft Authentication Card */}
+        <div className="w-full max-w-[440px] rounded-xs border border-border/80 bg-card p-8 sm:p-11 shadow-[0_2px_6px_rgba(0,0,0,0.12),0_0_1px_rgba(0,0,0,0.06)] text-left">
+          {/* Organization Logo & Name */}
+          <div className="flex items-center gap-2.5 mb-4">
+            <ShopLogo settings={settings} className="size-8 rounded-xs shadow-xs ring-1 ring-border/40 shrink-0" />
+            <span className="text-base font-semibold text-foreground tracking-tight">{settings.shop_name}</span>
+          </div>
+
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight mb-1">
+            {status === "setup" ? "Set up your shop" : "Sign in"}
+          </h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            {status === "setup"
+              ? "Create the local owner account"
+              : "Sign in to your desktop shop"}
+          </p>
+
+          <form onSubmit={submitAuth} className="space-y-4">
+            {status === "setup" && (
+              <div className="space-y-1">
+                <Label htmlFor="owner-name" className="text-sm font-normal text-foreground">
+                  Name
+                </Label>
                 <Input
-                  id="auth-username"
+                  id="owner-name"
                   required
-                  autoFocus
-                  value={form.username ? String(form.username) : ""}
-                  onChange={(e) => {
-                    if (error) setError("");
-                    setForm({ ...form, username: e.target.value });
-                  }}
+                  placeholder="Name"
+                  value={text(form.name ?? "")}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="h-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none"
                 />
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label htmlFor="auth-password">Password</Label>
-                  {status === "login" && (
-                    <button
-                      type="button"
-                      onClick={() => setForgotModalOpen(true)}
-                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline dark:text-emerald-400 cursor-pointer"
-                    >
-                      Forgot password?
-                    </button>
-                  )}
-                </div>
+            )}
+
+            <div className="space-y-1">
+              <Label htmlFor="auth-username" className="text-sm font-normal text-foreground">
+                Username
+              </Label>
+              <Input
+                id="auth-username"
+                required
+                autoFocus
+                placeholder="Username"
+                value={form.username ? String(form.username) : ""}
+                onChange={(e) => {
+                  if (error) setError("");
+                  setForm({ ...form, username: e.target.value });
+                }}
+                className="h-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="auth-password" className="text-sm font-normal text-foreground">
+                Password
+              </Label>
+              <div className="relative">
                 <Input
                   id="auth-password"
                   required
-                  type="password"
+                  type={showAuthPassword ? "text" : "password"}
                   minLength={status === "setup" ? 8 : undefined}
+                  placeholder="Password"
                   value={form.password ? String(form.password) : ""}
                   onChange={(e) => {
                     if (error) setError("");
                     setForm({ ...form, password: e.target.value });
                   }}
-                  className={error ? "border-red-500/80 focus-visible:ring-red-500/30" : ""}
+                  className={`h-9 pr-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none ${
+                    error ? "border-red-500 focus-visible:ring-red-500" : ""
+                  }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowAuthPassword(!showAuthPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors rounded-xs"
+                  aria-label={showAuthPassword ? "Hide password" : "Show password"}
+                >
+                  {showAuthPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
               </div>
-              {error && (
-                <div role="alert" className="rounded-md bg-red-50 dark:bg-red-950/40 p-2.5 text-xs text-red-600 dark:text-red-400 font-medium border border-red-200 dark:border-red-900/50 flex items-center justify-between">
-                  <span>{error}</span>
-                  {status === "login" && (
-                    <button
-                      type="button"
-                      onClick={() => setForgotModalOpen(true)}
-                      className="text-xs underline font-semibold shrink-0 ml-2 cursor-pointer"
-                    >
-                      Need help?
-                    </button>
-                  )}
-                </div>
-              )}
-              <Button disabled={busy} className="w-full flex items-center justify-center gap-2" type="submit">
-                {busy && <Loader2 className="size-4 animate-spin shrink-0" />}
-                <span>
-                  {busy
-                    ? status === "setup"
-                      ? "Setting up..."
-                      : "Verifying..."
-                    : status === "setup"
-                      ? "Create shop"
-                      : "Sign in"}
-                </span>
+            </div>
+
+            {status === "login" && (
+              <div className="pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => setForgotModalOpen(true)}
+                  className="text-sm text-emerald-700 hover:text-emerald-800 hover:underline dark:text-emerald-400 font-normal cursor-pointer"
+                >
+                  Can&apos;t access your account?
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <div role="alert" className="text-sm text-[#e81123] dark:text-red-400 font-normal leading-tight pt-1">
+                {error}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-6">
+              <Button
+                disabled={busy}
+                type="submit"
+                aria-label={status === "setup" ? "Create shop" : "Sign in"}
+                className="min-w-[108px] h-8.5 px-6 bg-emerald-700 hover:bg-emerald-800 text-white font-normal text-sm rounded-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                {busy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <span>{status === "setup" ? "Create shop" : "Sign in"}</span>
+                )}
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+          </form>
+        </div>
+
+        {/* Microsoft Signature "Sign-in options" card beneath */}
+        {status === "login" && (
+          <button
+            type="button"
+            onClick={() => setForgotModalOpen(true)}
+            className="mt-4 w-full max-w-[440px] rounded-xs border border-border/80 bg-card p-3 shadow-[0_2px_6px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-muted/40 transition-colors text-left cursor-pointer"
+          >
+            <KeyRound className="size-6 text-muted-foreground ml-1 shrink-0" />
+            <span className="text-[14px] text-foreground font-normal">Sign-in options</span>
+          </button>
+        )}
+
+        {/* Bottom Right Microsoft Footer */}
+        <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-end gap-6 text-[12px] text-muted-foreground/80 pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => setForgotModalOpen(true)}
+            className="hover:text-foreground hover:underline cursor-pointer"
+          >
+            Can&apos;t access your account?
+          </button>
+          <span>Offline Local ERP</span>
+          <span>© 2026 {settings.shop_name}</span>
+        </footer>
 
         {forgotModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
