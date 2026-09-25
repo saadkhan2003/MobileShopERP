@@ -1,6 +1,6 @@
 {
-  "version": "0.4.2",
-  "critical": false,
-  "minimum_version": "0.4.0",
-  "notes": "Release 0.4.2: Enterprise brand assets & icons, executive sidebar redesign, sign-out safety confirmation modal, and terminal status indicators."
+  "version": "0.4.3",
+  "critical": true,
+  "minimum_version": "0.4.3",
+  "notes": "Release 0.4.3: Refined enterprise sidebar ergonomics, enhanced brand identity scaling, and terminal status indicators."
 }

@@ -2016,7 +2016,7 @@ dependencies = [
 
 [[package]]
 name = "mobile-shop-desktop"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "mobile_shop_backend",
  "serde_json",
