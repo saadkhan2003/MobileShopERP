@@ -950,13 +950,17 @@ function VendorInfoModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
       <div className="w-full max-w-lg rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
         <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-sm bg-black text-white flex items-center justify-center font-bold text-xs tracking-wider">
-              S&amp;S
-            </div>
+          <div className="flex items-center gap-3">
+            <img
+              src="/stack-and-scale-icon.png"
+              alt="Stack & Scale"
+              className="size-9 object-contain"
+            />
             <div>
-              <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack and Scale</h3>
-              <p className="text-[11px] text-zinc-500">Enterprise Systems &amp; Software Solutions</p>
+              <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack &amp; Scale</h3>
+              <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
+                Sovereign Software &amp; Enterprise Systems
+              </p>
             </div>
           </div>
           <button
@@ -969,15 +973,13 @@ function VendorInfoModal({
           </button>
         </div>
 
-        <div className="space-y-3 text-xs text-zinc-600 leading-relaxed">
-          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-1.5">
-            <div className="font-semibold text-xs text-zinc-900 flex items-center gap-2">
-              <span className="size-2 rounded-full bg-emerald-500" />
-              <span>Made by Stack and Scale</span>
-            </div>
-            <p className="text-zinc-600 text-xs">
-              Mobile Shop ERP is engineered by <strong>Stack and Scale</strong> — delivering high-speed desktop architecture, offline-first data reliability, secure local SQLite management, and enterprise-grade retail POS workflows.
-            </p>
+        <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed">
+          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-4 flex items-center justify-center">
+            <img
+              src="/stack-and-scale-logo.png"
+              alt="Stack & Scale - Sovereign Software & Enterprise Systems"
+              className="h-10 object-contain"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
@@ -988,9 +990,9 @@ function VendorInfoModal({
               </p>
             </div>
             <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
-              <div className="font-semibold text-zinc-900 text-xs">Offline &amp; Private</div>
+              <div className="font-semibold text-zinc-900 text-xs">Sovereign &amp; Offline</div>
               <p className="text-[11px] text-zinc-500">
-                Zero cloud reliance. Your customer ledgers, sales transactions, and profit margins remain strictly on your local PC.
+                100% offline local database. Your customer ledgers, sales transactions, and profit margins remain strictly on your local PC.
               </p>
             </div>
           </div>
@@ -1000,9 +1002,9 @@ function VendorInfoModal({
             <p className="text-zinc-500">
               Need custom report formats, multi-branch network sync, hardware integrations (thermal printers, barcode scanners, cash drawers), or tailored features?
             </p>
-            <div className="pt-1 border-t border-zinc-200 flex items-center justify-between text-zinc-700">
-              <span>Solution Partner:</span>
-              <span className="font-semibold text-zinc-900">Stack and Scale</span>
+            <div className="pt-1.5 border-t border-zinc-200 flex items-center justify-between text-zinc-700">
+              <span>Engineering Partner:</span>
+              <span className="font-semibold text-zinc-900">Stack &amp; Scale</span>
             </div>
           </div>
         </div>
@@ -1497,7 +1499,14 @@ function App() {
             </div>
           </form>
           <div className="mt-5 pt-3.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
-            <span>Engineered by <strong className="font-medium text-zinc-700">Stack and Scale</strong></span>
+            <div className="flex items-center gap-2">
+              <img
+                src="/stack-and-scale-icon.png"
+                alt="Stack & Scale"
+                className="size-3.5 object-contain"
+              />
+              <span>Engineered by <strong className="font-medium text-zinc-700">Stack &amp; Scale</strong></span>
+            </div>
             <button
               type="button"
               onClick={() => setVendorModalOpen(true)}
@@ -1532,8 +1541,13 @@ function App() {
 
         {/* Bottom Microsoft Footer */}
         <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-between text-[12px] text-zinc-500 pointer-events-auto">
-          <div className="flex items-center gap-2">
-            <span>Made by <strong className="font-medium text-zinc-800">Stack and Scale</strong></span>
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/stack-and-scale-icon.png"
+              alt="Stack & Scale"
+              className="h-4 w-auto object-contain"
+            />
+            <span>Made by <strong className="font-medium text-zinc-800">Stack &amp; Scale</strong></span>
             <span className="text-zinc-300">•</span>
             <button
               type="button"
@@ -1904,8 +1918,12 @@ function App() {
         {!sidebarCollapsed ? (
           <div className="mx-2 mb-2 p-2.5 rounded-lg border border-border/50 bg-muted/20 text-xs">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-[11px] text-foreground flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-emerald-500" />
+              <span className="font-semibold text-[11px] text-foreground flex items-center gap-2">
+                <img
+                  src="/stack-and-scale-icon.png"
+                  alt="Stack & Scale"
+                  className="size-3.5 object-contain"
+                />
                 Stack &amp; Scale
               </span>
               <button
@@ -1916,8 +1934,8 @@ function App() {
                 About
               </button>
             </div>
-            <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
-              Made by Stack and Scale • Retail ERP
+            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+              Sovereign Software &amp; Enterprise Systems
             </p>
           </div>
         ) : (
@@ -1925,10 +1943,16 @@ function App() {
             <button
               type="button"
               onClick={() => setVendorModalOpen(true)}
-              title="Made by Stack and Scale"
-              aria-label="Made by Stack and Scale"
-              className="size-2 rounded-full bg-emerald-500 hover:scale-125 transition-transform cursor-pointer"
-            />
+              title="Stack & Scale - Sovereign Software"
+              aria-label="Stack & Scale"
+              className="p-1 rounded-sm hover:bg-muted/60 transition-colors cursor-pointer"
+            >
+              <img
+                src="/stack-and-scale-icon.png"
+                alt="Stack & Scale"
+                className="size-4 object-contain"
+              />
+            </button>
           </div>
         )}
         <div className="border-t border-border/40 p-2">
@@ -2524,30 +2548,34 @@ function App() {
               <Card className="mt-5 border-border/60">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-emerald-500" />
-                        About Stack and Scale
-                      </CardTitle>
-                      <p className="text-xs text-muted-foreground mt-0.5">Software Engineering &amp; Retail Systems Solutions</p>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="/stack-and-scale-icon.png"
+                        alt="Stack & Scale"
+                        className="size-8 object-contain"
+                      />
+                      <div>
+                        <CardTitle className="text-base">About Stack &amp; Scale</CardTitle>
+                        <p className="text-xs text-muted-foreground mt-0.5">Sovereign Software &amp; Enterprise Systems</p>
+                      </div>
                     </div>
                     <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      Official Provider
+                      Official Solutions Partner
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4 text-xs text-muted-foreground leading-relaxed">
                   <p>
-                    This ERP platform was designed and engineered by <strong className="text-foreground">Stack and Scale</strong>. Built as an offline-first, native desktop application engineered with Rust, SQLite, and React to ensure zero latency, ironclad local data security, and uninterrupted retail store operations.
+                    This ERP platform was designed and engineered by <strong className="text-foreground">Stack &amp; Scale</strong>. Built as an offline-first, native desktop application engineered with Rust, SQLite, and React to ensure zero latency, ironclad local data security, and uninterrupted retail store operations.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-3 pt-3 border-t text-[11px]">
                     <div>
-                      <span className="font-semibold text-foreground block">Engineering Firm</span>
-                      <span>Stack and Scale</span>
+                      <span className="font-semibold text-foreground block">Engineering Studio</span>
+                      <span>Stack &amp; Scale</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-foreground block">Specialization</span>
-                      <span>Offline POS, Inventory Systems &amp; Hardware Integrations</span>
+                      <span className="font-semibold text-foreground block">Core Focus</span>
+                      <span>Sovereign Offline POS &amp; Retail ERP Systems</span>
                     </div>
                     <div>
                       <span className="font-semibold text-foreground block">Support &amp; Custom Features</span>

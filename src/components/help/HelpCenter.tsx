@@ -949,14 +949,22 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
         badge: "Partner",
         content: (
           <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border bg-white dark:bg-card p-4 flex items-center justify-center shadow-xs">
+              <img
+                src="/stack-and-scale-logo.png"
+                alt="Stack & Scale - Sovereign Software & Enterprise Systems"
+                className="h-10 object-contain"
+              />
+            </div>
+
             <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-200 text-xs">
-              <strong>🚀 Engineered by Stack and Scale:</strong> Mobile Shop ERP is custom-built to deliver complete offline independence, high-speed desktop transactions, local data privacy, and resilient retail workflows.
+              <strong>🚀 Engineered by Stack &amp; Scale:</strong> Mobile Shop ERP is custom-built to deliver complete offline independence, high-speed desktop transactions, local data privacy, and resilient retail workflows.
             </div>
 
             <h4 className="font-semibold text-base text-foreground pt-1">1. Developer Information</h4>
             <div className="space-y-2 text-xs text-muted-foreground">
               <p>
-                <strong>Stack and Scale</strong> specializes in enterprise retail solutions, offline-first architectures, native desktop applications, and high-load business database software.
+                <strong>Stack &amp; Scale</strong> specializes in sovereign enterprise software, offline-first architectures, native desktop systems, and robust database applications.
               </p>
             </div>
 
