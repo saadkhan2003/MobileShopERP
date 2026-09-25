@@ -973,7 +973,7 @@ function VendorInfoModal({
             <img
               src="/stack-and-scale-logo.png"
               alt="Stack & Scale - Sovereign Software & Enterprise Systems"
-              className="h-16 sm:h-20 w-auto max-w-full object-contain drop-shadow-xs"
+              className="h-10 sm:h-12 w-auto max-w-[85%] object-contain"
             />
             <p className="text-xs text-zinc-500 font-normal max-w-sm">
               Software built for store floors, warehouses, and real operations.
