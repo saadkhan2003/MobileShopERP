@@ -1195,19 +1195,19 @@ function App() {
     );
   if (status !== "ready")
     return (
-      <div className="relative flex min-h-screen w-full flex-col justify-center items-center bg-[#f3f4f6] dark:bg-[#1f1f1f] p-4 text-foreground selection:bg-emerald-500/20">
+      <div className="relative flex min-h-screen w-full flex-col justify-center items-center bg-white dark:bg-white p-4 text-zinc-900 selection:bg-zinc-200">
         {/* Main Microsoft Authentication Card */}
-        <div className="w-full max-w-[440px] rounded-xs border border-border/80 bg-card p-8 sm:p-11 shadow-[0_2px_6px_rgba(0,0,0,0.12),0_0_1px_rgba(0,0,0,0.06)] text-left">
+        <div className="w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-8 sm:p-11 shadow-[0_4px_16px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.06)] text-left">
           {/* Organization Logo & Name */}
           <div className="flex items-center gap-2.5 mb-4">
-            <ShopLogo settings={settings} className="size-8 rounded-xs shadow-xs ring-1 ring-border/40 shrink-0" />
-            <span className="text-base font-semibold text-foreground tracking-tight">{settings.shop_name}</span>
+            <ShopLogo settings={settings} className="size-8 rounded-xs shadow-xs ring-1 ring-zinc-200 shrink-0" />
+            <span className="text-base font-semibold text-zinc-900 tracking-tight">{settings.shop_name}</span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight mb-1">
+          <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight mb-1">
             {status === "setup" ? "Set up your shop" : "Sign in"}
           </h1>
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-sm text-zinc-600 mb-6">
             {status === "setup"
               ? "Create the local owner account"
               : "Sign in to your desktop shop"}
@@ -1216,7 +1216,7 @@ function App() {
           <form onSubmit={submitAuth} className="space-y-4">
             {status === "setup" && (
               <div className="space-y-1">
-                <Label htmlFor="owner-name" className="text-sm font-normal text-foreground">
+                <Label htmlFor="owner-name" className="text-sm font-normal text-zinc-800">
                   Name
                 </Label>
                 <Input
@@ -1225,13 +1225,13 @@ function App() {
                   placeholder="Name"
                   value={text(form.name ?? "")}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="h-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none"
+                  className="h-9 rounded-xs border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-1 focus-visible:ring-black focus-visible:border-black text-sm shadow-none"
                 />
               </div>
             )}
 
             <div className="space-y-1">
-              <Label htmlFor="auth-username" className="text-sm font-normal text-foreground">
+              <Label htmlFor="auth-username" className="text-sm font-normal text-zinc-800">
                 Username
               </Label>
               <Input
@@ -1244,12 +1244,12 @@ function App() {
                   if (error) setError("");
                   setForm({ ...form, username: e.target.value });
                 }}
-                className="h-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none"
+                className="h-9 rounded-xs border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-1 focus-visible:ring-black focus-visible:border-black text-sm shadow-none"
               />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="auth-password" className="text-sm font-normal text-foreground">
+              <Label htmlFor="auth-password" className="text-sm font-normal text-zinc-800">
                 Password
               </Label>
               <div className="relative">
@@ -1264,14 +1264,14 @@ function App() {
                     if (error) setError("");
                     setForm({ ...form, password: e.target.value });
                   }}
-                  className={`h-9 pr-9 rounded-xs border-input focus-visible:ring-1 focus-visible:ring-emerald-700 focus-visible:border-emerald-700 text-sm shadow-none ${
+                  className={`h-9 pr-9 rounded-xs border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-1 focus-visible:ring-black focus-visible:border-black text-sm shadow-none ${
                     error ? "border-red-500 focus-visible:ring-red-500" : ""
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowAuthPassword(!showAuthPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors rounded-xs"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-800 p-1 transition-colors rounded-xs cursor-pointer"
                   aria-label={showAuthPassword ? "Hide password" : "Show password"}
                 >
                   {showAuthPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -1284,7 +1284,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => setForgotModalOpen(true)}
-                  className="text-sm text-emerald-700 hover:text-emerald-800 hover:underline dark:text-emerald-400 font-normal cursor-pointer"
+                  className="text-sm text-emerald-700 hover:text-emerald-800 hover:underline font-normal cursor-pointer"
                 >
                   Can&apos;t access your account?
                 </button>
@@ -1292,7 +1292,7 @@ function App() {
             )}
 
             {error && (
-              <div role="alert" className="text-sm text-[#e81123] dark:text-red-400 font-normal leading-tight pt-1">
+              <div role="alert" className="text-sm text-[#e81123] font-normal leading-tight pt-1">
                 {error}
               </div>
             )}
@@ -1302,7 +1302,7 @@ function App() {
                 disabled={busy}
                 type="submit"
                 aria-label={status === "setup" ? "Create shop" : "Sign in"}
-                className="min-w-[108px] h-8.5 px-6 bg-emerald-700 hover:bg-emerald-800 text-white font-normal text-sm rounded-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="min-w-[108px] h-8.5 px-6 bg-black hover:bg-zinc-800 text-white dark:bg-black dark:hover:bg-zinc-800 dark:text-white font-normal text-sm rounded-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
                 {busy ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -1319,19 +1319,19 @@ function App() {
           <button
             type="button"
             onClick={() => setForgotModalOpen(true)}
-            className="mt-4 w-full max-w-[440px] rounded-xs border border-border/80 bg-card p-3 shadow-[0_2px_6px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-muted/40 transition-colors text-left cursor-pointer"
+            className="mt-4 w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-3 shadow-[0_1px_4px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-50 transition-colors text-left cursor-pointer"
           >
-            <KeyRound className="size-6 text-muted-foreground ml-1 shrink-0" />
-            <span className="text-[14px] text-foreground font-normal">Sign-in options</span>
+            <KeyRound className="size-6 text-zinc-600 ml-1 shrink-0" />
+            <span className="text-[14px] text-zinc-900 font-normal">Sign-in options</span>
           </button>
         )}
 
         {/* Bottom Right Microsoft Footer */}
-        <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-end gap-6 text-[12px] text-muted-foreground/80 pointer-events-auto">
+        <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-end gap-6 text-[12px] text-zinc-500 pointer-events-auto">
           <button
             type="button"
             onClick={() => setForgotModalOpen(true)}
-            className="hover:text-foreground hover:underline cursor-pointer"
+            className="hover:text-zinc-900 hover:underline cursor-pointer"
           >
             Can&apos;t access your account?
           </button>
