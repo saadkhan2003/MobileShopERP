@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import defaultShopLogo from "../../assets/stack-and-scale-icon.png";
 
 export type ShopSettings = {
   shop_name: string;
@@ -42,11 +43,11 @@ export function ShopLogo({
   className?: string;
 }) {
   return (
-    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-900 text-white shadow-sm ring-1 ring-emerald-500/20 ${className}`}>
+    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white dark:bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 ${className}`}>
       {settings.logo_data ? (
         <img src={settings.logo_data} alt="Shop logo" className="size-full object-contain bg-white" />
       ) : (
-        <img src="/logo.png" alt={settings.shop_name || "Mobile Shop ERP"} className="size-full object-cover" />
+        <img src={defaultShopLogo} alt={settings.shop_name || "Mobile Shop ERP"} className="size-full object-contain p-0.5" />
       )}
     </div>
   );
