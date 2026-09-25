@@ -36,6 +36,7 @@ import {
   ShoppingBag,
   Smartphone,
   Truck,
+  User,
   Users,
   Wrench,
 } from "lucide-react";
@@ -508,7 +509,7 @@ const modules: Record<string, Module> = {
   },
 };
 const menuGroups = [
-  { title: "Overview", items: ["dashboard", "reports", "help"] },
+  { title: "Overview", items: ["dashboard", "reports"] },
   {
     title: "Inventory",
     items: ["products", "phones", "purchases", "used", "rates", "priceHistory"],
@@ -522,6 +523,10 @@ const menuGroups = [
   {
     title: "Management",
     items: ["history", "search", "users", "branches", "settings", "backup", "audit"],
+  },
+  {
+    title: "Help & Documentation",
+    items: ["help"],
   },
 ];
 async function api<T = unknown>(
@@ -1182,19 +1187,19 @@ function App() {
   if (status !== "ready")
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/40 p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <ShopLogo settings={settings} className="mb-3 size-12" />
-            <CardTitle className="text-2xl">{settings.shop_name}</CardTitle>
+        <Card className="w-full max-w-sm shadow-sm border border-border">
+          <CardHeader className="text-center pb-2">
+            <ShopLogo settings={settings} className="mx-auto mb-2 size-12 rounded-xl shadow-xs ring-1 ring-border" />
+            <CardTitle className="text-xl font-bold tracking-tight">{settings.shop_name}</CardTitle>
             {settings.tagline && <p className="text-xs text-muted-foreground">{settings.tagline}</p>}
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1">
               {status === "setup"
                 ? "Create the local owner account"
                 : "Sign in to your desktop shop"}
             </p>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={submitAuth} className="space-y-4">
+          <CardContent className="pt-2">
+            <form onSubmit={submitAuth} className="space-y-3.5">
               {status === "setup" && (
                 <div>
                   <Label htmlFor="owner-name">Name</Label>
@@ -1232,7 +1237,7 @@ function App() {
                 />
               </div>
               {error && (
-                <p role="alert" className="text-sm text-red-600">
+                <p role="alert" className="text-xs text-red-600 font-medium">
                   {error}
                 </p>
               )}
