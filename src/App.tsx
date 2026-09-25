@@ -1422,10 +1422,13 @@ function App() {
               <HelpCircle size={14} className="text-primary" />
               <span>Help & Docs</span>
             </Button>
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground shadow-2xs font-medium">
+            <div
+              title="Main Store · POS Terminal (Identifies the active retail counter/station)"
+              className="hidden sm:flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground shadow-2xs font-medium cursor-default select-none"
+            >
               <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
               <span className="text-foreground font-semibold">Main Store</span>
-              <span className="text-[10px] text-muted-foreground font-normal">| Live Terminal</span>
+              <span className="text-[11px] text-muted-foreground font-medium">· POS Terminal</span>
             </div>
             {user && (
               <div className="relative pl-1">
