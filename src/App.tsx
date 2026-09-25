@@ -25,6 +25,7 @@ import {
   History,
   KeyRound,
   LayoutDashboard,
+  Loader2,
   LogOut,
   PackagePlus,
   PanelLeft,
@@ -39,6 +40,7 @@ import {
   User,
   Users,
   Wrench,
+  X,
 } from "lucide-react";
 import { HelpCenter } from "./components/help/HelpCenter";
 import { Button } from "./components/ui/button";
@@ -960,6 +962,8 @@ function App() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [copiedResetCmd, setCopiedResetCmd] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
     new_password: "",
@@ -1142,7 +1146,8 @@ function App() {
         setForm({});
       }
     } catch (e) {
-      setError(String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg.replace(/^Error:\s*/, ""));
     } finally {
       setBusy(false);
     }
@@ -1217,36 +1222,142 @@ function App() {
                   id="auth-username"
                   required
                   autoFocus
-                  value={text(form.username ?? "")}
-                  onChange={(e) =>
-                    setForm({ ...form, username: e.target.value })
-                  }
+                  value={form.username ? String(form.username) : ""}
+                  onChange={(e) => {
+                    if (error) setError("");
+                    setForm({ ...form, username: e.target.value });
+                  }}
                 />
               </div>
               <div>
-                <Label htmlFor="auth-password">Password</Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label htmlFor="auth-password">Password</Label>
+                  {status === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => setForgotModalOpen(true)}
+                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline dark:text-emerald-400 cursor-pointer"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
                 <Input
                   id="auth-password"
                   required
                   type="password"
                   minLength={status === "setup" ? 8 : undefined}
-                  value={text(form.password ?? "")}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
+                  value={form.password ? String(form.password) : ""}
+                  onChange={(e) => {
+                    if (error) setError("");
+                    setForm({ ...form, password: e.target.value });
+                  }}
+                  className={error ? "border-red-500/80 focus-visible:ring-red-500/30" : ""}
                 />
               </div>
               {error && (
-                <p role="alert" className="text-xs text-red-600 font-medium">
-                  {error}
-                </p>
+                <div role="alert" className="rounded-md bg-red-50 dark:bg-red-950/40 p-2.5 text-xs text-red-600 dark:text-red-400 font-medium border border-red-200 dark:border-red-900/50 flex items-center justify-between">
+                  <span>{error}</span>
+                  {status === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => setForgotModalOpen(true)}
+                      className="text-xs underline font-semibold shrink-0 ml-2 cursor-pointer"
+                    >
+                      Need help?
+                    </button>
+                  )}
+                </div>
               )}
-              <Button disabled={busy} className="w-full" type="submit">
-                {status === "setup" ? "Create shop" : "Sign in"}
+              <Button disabled={busy} className="w-full flex items-center justify-center gap-2" type="submit">
+                {busy && <Loader2 className="size-4 animate-spin shrink-0" />}
+                <span>
+                  {busy
+                    ? status === "setup"
+                      ? "Setting up..."
+                      : "Verifying..."
+                    : status === "setup"
+                      ? "Create shop"
+                      : "Sign in"}
+                </span>
               </Button>
             </form>
           </CardContent>
         </Card>
+
+        {forgotModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+            <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-xl space-y-4 text-card-foreground">
+              <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                <div className="flex items-center gap-2 font-semibold text-base text-foreground">
+                  <KeyRound className="size-5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Password Recovery</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForgotModalOpen(false)}
+                  className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3.5 text-xs text-muted-foreground leading-relaxed">
+                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 p-3 text-emerald-900 dark:text-emerald-200">
+                  <p className="font-semibold text-xs text-emerald-950 dark:text-emerald-100 mb-1">
+                    Staff Accounts (Cashier, Technician, Salesman)
+                  </p>
+                  <p>
+                    Staff passwords can be reset instantly by the Store Owner under <strong>Settings → Staff & Roles</strong>.
+                  </p>
+                </div>
+
+                <div className="rounded-lg bg-muted/60 border border-border p-3.5 space-y-2">
+                  <p className="font-semibold text-xs text-foreground">
+                    Store Owner / Administrator Recovery
+                  </p>
+                  <p>
+                    Since Mobile Shop ERP is an offline local desktop system without cloud tracking, you can reset your owner credentials securely right from your terminal:
+                  </p>
+                  <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-950 px-3 py-2 font-mono text-[11px] text-zinc-100">
+                    <span className="truncate">npm run reset-password</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText("npm run reset-password");
+                        setCopiedResetCmd(true);
+                        setTimeout(() => setCopiedResetCmd(false), 2000);
+                      }}
+                      className="shrink-0 text-emerald-400 hover:text-emerald-300 font-sans text-xs underline cursor-pointer"
+                    >
+                      {copiedResetCmd ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Default reset credentials: username <strong>saadkhan2003</strong> / password <strong>admin1234</strong>.
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Or specify custom credentials:
+                  </p>
+                  <div className="rounded-md bg-zinc-950 px-3 py-1.5 font-mono text-[11px] text-zinc-300">
+                    cargo run --bin reset_password -- {form.username ? String(form.username) : "saadkhan2003"} &lt;new_password&gt;
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-border/50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setForgotModalOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   const m = modules[section];

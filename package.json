@@ -12,7 +12,8 @@
     "release:manifest": "node scripts/create-update-manifest.mjs",
     "test:backend": "cargo test --manifest-path rust/Cargo.toml",
     "test:ui": "vitest run",
-    "test": "npm run test:ui && node --test tests/release-manifest.test.mjs && npm run test:backend"
+    "test": "npm run test:ui && node --test tests/release-manifest.test.mjs && npm run test:backend",
+    "reset-password": "cargo run --manifest-path rust/Cargo.toml --bin reset_password --"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
