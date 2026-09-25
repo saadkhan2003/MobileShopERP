@@ -42,6 +42,8 @@ import {
   Truck,
   User,
   Users,
+  ExternalLink,
+  Globe,
   Wrench,
   X,
 } from "lucide-react";
@@ -973,43 +975,86 @@ function VendorInfoModal({
           </button>
         </div>
 
-        <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed">
-          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-4 flex items-center justify-center">
+        <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed max-h-[75vh] overflow-y-auto pr-1">
+          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-4 flex flex-col items-center justify-center text-center gap-2">
             <img
               src="/stack-and-scale-logo.png"
               alt="Stack & Scale - Sovereign Software & Enterprise Systems"
-              className="h-10 object-contain"
+              className="h-9 object-contain"
             />
+            <p className="text-[11px] text-zinc-500 font-normal">
+              Software built for store floors, warehouses, and real operations.
+            </p>
           </div>
 
+          {/* Executive & Company Info */}
+          <div className="rounded-xs border border-zinc-200 bg-zinc-50/50 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block">Founder &amp; CEO</span>
+              <span className="font-semibold text-zinc-900 text-sm">Muhammad Saad Khan</span>
+            </div>
+            <div className="sm:text-right">
+              <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider block">Official Portal</span>
+              <a
+                href="https://stackandscale.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-medium text-zinc-800 hover:text-black hover:underline text-xs"
+              >
+                <Globe className="size-3 text-zinc-500" />
+                stackandscale.org
+                <ExternalLink className="size-2.5 text-zinc-400" />
+              </a>
+            </div>
+          </div>
+
+          {/* 4 Core Pillars from stackandscale.org */}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
-              <div className="font-semibold text-zinc-900 text-xs">System Architecture</div>
+              <div className="font-semibold text-zinc-900 text-xs">100% Sovereignty</div>
               <p className="text-[11px] text-zinc-500">
-                Native Rust engine, scrypt cryptographic hashing, Tauri desktop bridge, and React interface.
+                Self-hosted, air-gapped ready architecture with complete local data custody and zero vendor lock-in.
               </p>
             </div>
             <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
-              <div className="font-semibold text-zinc-900 text-xs">Sovereign &amp; Offline</div>
+              <div className="font-semibold text-zinc-900 text-xs">Zero Per-Seat SaaS Tax</div>
               <p className="text-[11px] text-zinc-500">
-                100% offline local database. Your customer ledgers, sales transactions, and profit margins remain strictly on your local PC.
+                Unlimited cashiers, staff members, and devices. Never pay arbitrary recurring per-user penalties.
+              </p>
+            </div>
+            <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
+              <div className="font-semibold text-zinc-900 text-xs">Sub-Second Offline Engine</div>
+              <p className="text-[11px] text-zinc-500">
+                Terminals commit sales to local SQLite in under 1.2ms without freezes during internet outages.
+              </p>
+            </div>
+            <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
+              <div className="font-semibold text-zinc-900 text-xs">Enterprise Security</div>
+              <p className="text-[11px] text-zinc-500">
+                Native Rust engine, scrypt cryptographic key derivation, local audit ledger, and strict privacy.
               </p>
             </div>
           </div>
 
-          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1.5 text-[11px]">
+          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1 text-[11px]">
             <div className="font-semibold text-zinc-900">Customizations &amp; Enterprise Support</div>
             <p className="text-zinc-500">
-              Need custom report formats, multi-branch network sync, hardware integrations (thermal printers, barcode scanners, cash drawers), or tailored features?
+              Need multi-branch delta sync, custom invoice layouts, or specialized hardware (thermal printers, barcode scanners, cash drawers)? Enterprise partnerships available through Stack &amp; Scale.
             </p>
-            <div className="pt-1.5 border-t border-zinc-200 flex items-center justify-between text-zinc-700">
-              <span>Engineering Partner:</span>
-              <span className="font-semibold text-zinc-900">Stack &amp; Scale</span>
-            </div>
           </div>
         </div>
 
-        <div className="pt-2 flex justify-end gap-2 border-t border-zinc-200">
+        <div className="pt-2 flex items-center justify-between gap-2 border-t border-zinc-200">
+          <a
+            href="https://stackandscale.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:underline"
+          >
+            <Globe className="size-3.5 text-zinc-400" />
+            Visit stackandscale.org
+            <ExternalLink className="size-3 text-zinc-400" />
+          </a>
           <Button
             type="button"
             onClick={onClose}
@@ -2566,26 +2611,32 @@ function App() {
                 </CardHeader>
                 <CardContent className="space-y-4 text-xs text-muted-foreground leading-relaxed">
                   <p>
-                    This ERP platform was designed and engineered by <strong className="text-foreground">Stack &amp; Scale</strong>. Built as an offline-first, native desktop application engineered with Rust, SQLite, and React to ensure zero latency, ironclad local data security, and uninterrupted retail store operations.
+                    This ERP platform was designed and engineered by <strong className="text-foreground">Stack &amp; Scale</strong> (Founder &amp; CEO: <strong className="text-foreground">Muhammad Saad Khan</strong>). Built as an offline-first, native desktop application engineered with Rust, SQLite, and React to ensure zero latency, ironclad local data security, and uninterrupted retail store operations.
                   </p>
-                  <div className="grid gap-3 sm:grid-cols-3 pt-3 border-t text-[11px]">
+                  <div className="grid gap-3 sm:grid-cols-4 pt-3 border-t text-[11px]">
                     <div>
                       <span className="font-semibold text-foreground block">Engineering Studio</span>
                       <span>Stack &amp; Scale</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-foreground block">Core Focus</span>
-                      <span>Sovereign Offline POS &amp; Retail ERP Systems</span>
+                      <span className="font-semibold text-foreground block">Founder &amp; CEO</span>
+                      <span className="text-foreground font-medium">Muhammad Saad Khan</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-foreground block">Support &amp; Custom Features</span>
-                      <button
-                        type="button"
-                        onClick={() => setVendorModalOpen(true)}
-                        className="text-primary hover:underline font-medium cursor-pointer"
+                      <span className="font-semibold text-foreground block">Core Focus</span>
+                      <span>Sovereign Offline POS &amp; ERP</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-foreground block">Official Portal</span>
+                      <a
+                        href="https://stackandscale.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
                       >
-                        View Provider Profile →
-                      </button>
+                        stackandscale.org
+                        <ExternalLink className="size-2.5" />
+                      </a>
                     </div>
                   </div>
                 </CardContent>

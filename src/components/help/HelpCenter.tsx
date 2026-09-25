@@ -25,6 +25,8 @@ import {
   RefreshCw,
   LogOut,
   PanelLeft,
+  Globe,
+  ExternalLink,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -961,28 +963,57 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
               <strong>🚀 Engineered by Stack &amp; Scale:</strong> Mobile Shop ERP is custom-built to deliver complete offline independence, high-speed desktop transactions, local data privacy, and resilient retail workflows.
             </div>
 
-            <h4 className="font-semibold text-base text-foreground pt-1">1. Developer Information</h4>
+            <h4 className="font-semibold text-base text-foreground pt-1">1. Developer &amp; Executive Leadership</h4>
             <div className="space-y-2 text-xs text-muted-foreground">
               <p>
-                <strong>Stack &amp; Scale</strong> specializes in sovereign enterprise software, offline-first architectures, native desktop systems, and robust database applications.
+                <strong>Stack &amp; Scale</strong> is led by Founder &amp; CEO <strong className="text-foreground">Muhammad Saad Khan</strong>. The firm specializes in sovereign enterprise software, offline-first architectures, high-load business database systems, and zero-downtime retail platforms.
               </p>
+              <div className="pt-1">
+                <a
+                  href="https://stackandscale.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline text-xs"
+                >
+                  <Globe className="size-3.5" />
+                  Visit official website: stackandscale.org
+                  <ExternalLink className="size-3" />
+                </a>
+              </div>
             </div>
 
-            <h4 className="font-semibold text-base text-foreground pt-1">2. Core Architectural Pillars</h4>
+            <h4 className="font-semibold text-base text-foreground pt-1">2. Core Architectural Pillars (stackandscale.org)</h4>
             <div className="grid gap-3 sm:grid-cols-2 text-xs">
-              <div className="rounded-lg border p-3 bg-card">
-                <strong className="text-foreground block mb-1">Zero Latency Local Engine</strong>
-                <p className="text-muted-foreground">Embedded SQLite with scrypt cryptographic security, processing sales and lookups without network round-trips.</p>
+              <div className="rounded-lg border p-3 bg-card space-y-1">
+                <strong className="text-foreground block font-medium">100% Infrastructure Sovereignty</strong>
+                <p className="text-muted-foreground">Self-hosted, air-gapped ready architecture with complete local data custody. Zero telemetry tracking and zero vendor lock-in.</p>
               </div>
-              <div className="rounded-lg border p-3 bg-card">
-                <strong className="text-foreground block mb-1">Hardware Reliability</strong>
+              <div className="rounded-lg border p-3 bg-card space-y-1">
+                <strong className="text-foreground block font-medium">Zero Per-Seat SaaS Tax</strong>
+                <p className="text-muted-foreground">Unlimited cashiers, staff members, and devices. Never pay arbitrary recurring per-user monthly subscription fees.</p>
+              </div>
+              <div className="rounded-lg border p-3 bg-card space-y-1">
+                <strong className="text-foreground block font-medium">Sub-Second Local Engine</strong>
+                <p className="text-muted-foreground">Embedded SQLite with scrypt cryptographic security, processing sales and barcode scans in under 1.2ms without network latency.</p>
+              </div>
+              <div className="rounded-lg border p-3 bg-card space-y-1">
+                <strong className="text-foreground block font-medium">Hardware Reliability</strong>
                 <p className="text-muted-foreground">Native support for thermal receipt printers, USB barcode/IMEI scanners, and local PDF invoice generation.</p>
               </div>
             </div>
 
             <h4 className="font-semibold text-base text-foreground pt-1">3. Custom Integrations &amp; Enterprise Support</h4>
             <p className="text-xs text-muted-foreground">
-              For custom modules, multi-branch data synchronization, tailored invoice designs, or dedicated on-premise hardware setup, connect with Stack and Scale.
+              Need custom report formats, multi-branch network sync, or tailored enterprise workflows? Explore technical blueprints and enterprise partnerships at{" "}
+              <a
+                href="https://stackandscale.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium inline-flex items-center gap-0.5"
+              >
+                stackandscale.org
+                <ExternalLink className="size-2.5 inline" />
+              </a>.
             </p>
           </div>
         ),
