@@ -20,6 +20,11 @@ import {
   RotateCcw,
   Building2,
   Wallet,
+  Sparkles,
+  Settings2,
+  RefreshCw,
+  LogOut,
+  PanelLeft,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -46,6 +51,7 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
   const categories = [
     { id: "all", label: "All Topics", icon: <BookOpen size={16} /> },
     { id: "roles", label: "Quick Start & Roles", icon: <ShieldCheck size={16} /> },
+    { id: "branding", label: "Branding & Store Identity", icon: <Sparkles size={16} /> },
     { id: "cash", label: "Cash Register", icon: <Coins size={16} /> },
     { id: "paperless", label: "No Scanner / Printer", icon: <Printer size={16} /> },
     { id: "inventory", label: "Inventory & Stock", icon: <Boxes size={16} /> },
@@ -771,6 +777,167 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
                 <kbd className="rounded border bg-background px-2 py-0.5 font-mono text-[10px]">Esc</kbd>
               </div>
             </div>
+          </div>
+        ),
+      },
+      {
+        id: "branding-identity",
+        category: "branding",
+        title: "Store Branding & Visual Customization",
+        summary: "Custom logo uploads, enterprise tagline, store header, receipt footer, and print templates.",
+        badge: "Customization",
+        content: (
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-emerald-950 dark:text-emerald-200 text-xs">
+              <strong>✨ Master Brand Personalization:</strong> You can completely customize the visual identity of your ERP. Your store name, custom tagline, and uploaded logo dynamically populate the sidebar, login screen, PDF invoice headers, thermal receipts, and barcode labels.
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground flex items-center gap-2">
+              <Sparkles size={16} className="text-emerald-500" /> 1. Uploading Your Store Logo
+            </h4>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <p>To brand your business across all customer touchpoints:</p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>Navigate to <strong>Settings</strong> &rarr; <strong>Global Settings</strong>.</li>
+                <li>In the <strong>Shop Logo</strong> section, click <strong>Choose Logo</strong> or drop your image file.</li>
+                <li>Supported formats: <strong>PNG, JPEG, WebP</strong> (recommended square or circular, up to 1 MB).</li>
+                <li>Click <strong>Save Settings</strong> to apply the new branding system-wide.</li>
+              </ol>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1 flex items-center gap-2">
+              <Settings2 size={16} className="text-primary" /> 2. Store Header, Tagline &amp; Receipt Messages
+            </h4>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Shop Name &amp; Tagline:</strong> Displays prominently on the main sidebar squircle tile, top bar, and invoice headers (e.g. <em>"Mobile City · Smartphone &amp; Repair Hub"</em>).</li>
+                <li><strong>Phone Number &amp; Store Address:</strong> Prints on all customer sale invoices and repair intake job cards.</li>
+                <li><strong>Receipt Footer Note:</strong> Add a personalized warranty note, return policy, or courtesy message (e.g., <em>"Thank you for choosing us! 7-day checking warranty on all accessories."</em>).</li>
+              </ul>
+            </div>
+
+            {onNavigate && (
+              <div className="pt-2">
+                <Button size="sm" variant="outline" onClick={() => onNavigate("settings")}>
+                  Open Global Settings <ArrowRight size={14} className="ml-1" />
+                </Button>
+              </div>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "profile-safety",
+        category: "management",
+        title: "User Profile & Accidental Sign-Out Guard",
+        summary: "Executive profile dropdown, active POS workstation pill, and accidental logout confirmation dialog.",
+        badge: "Security",
+        content: (
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-200 text-xs">
+              <strong>🛡️ Transaction Protection:</strong> To prevent losing active customer carts, in-progress repair tickets, or unsaved inventory entries, the application features an automatic confirmation prompt before signing out.
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground flex items-center gap-2">
+              <Users size={16} className="text-primary" /> 1. Executive Profile Dropdown
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              The top-right header features an executive profile pill showing your user avatar monogram, active username, role pill (<strong>Admin</strong>, <strong>Cashier</strong>, or <strong>Technician</strong>), and workstation status. Clicking the profile opens your account details and quick actions.
+            </p>
+
+            <h4 className="font-semibold text-base text-foreground pt-1 flex items-center gap-2">
+              <LogOut size={16} className="text-rose-500" /> 2. Sign-Out Confirmation Safety Modal
+            </h4>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <p>
+                When you click <strong>Sign Out</strong>:
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>A modal dialog appears: <em>"Are you sure you want to sign out? Any unsaved edits will be discarded."</em></li>
+                <li>Click <strong>Cancel</strong> to return immediately to your work without interruption.</li>
+                <li>Click <strong>Confirm Sign Out</strong> to securely end your active session and return to the lock screen.</li>
+              </ul>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1 flex items-center gap-2">
+              <Building2 size={16} className="text-emerald-500" /> 3. Live POS Terminal Status Indicator
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              The header status badge shows <code>Main Store · POS Terminal</code> to immediately verify station context and avoid processing transactions under the wrong terminal or shift.
+            </p>
+          </div>
+        ),
+      },
+      {
+        id: "updates-guide",
+        category: "backup",
+        title: "Signed Software Updates & Security Policy",
+        summary: "Multi-platform signed releases, background update checking, and critical safety enforcement.",
+        badge: "Maintenance",
+        content: (
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-200 text-xs">
+              <strong>🔒 Cryptographically Verified Updates:</strong> All desktop application updates are signed with private release keys. The application validates the cryptographic signature before applying any package, preventing unauthorized modifications.
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground flex items-center gap-2">
+              <RefreshCw size={16} className="text-primary" /> 1. How Auto-Update Checking Works
+            </h4>
+            <ul className="list-disc pl-5 space-y-1 text-xs text-muted-foreground">
+              <li><strong>Startup Check:</strong> When the app opens, it connects to the official release feed if internet is available.</li>
+              <li><strong>Periodic Background Checks:</strong> The app checks for new releases every 30 minutes while running.</li>
+              <li><strong>Focus Check:</strong> When the desktop window regains focus after 5 minutes of inactivity, it refreshes the update feed.</li>
+            </ul>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">2. Release Notifications &amp; One-Click Install</h4>
+            <p className="text-xs text-muted-foreground">
+              When a new version is published:
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-xs text-muted-foreground">
+              <li>A high-visibility notification banner appears above the current module detailing the new version and release notes.</li>
+              <li>Click <strong>Update &amp; Restart</strong> to download the signed payload and restart into the latest version. Your local database and store records remain completely intact.</li>
+            </ul>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">3. Critical Release Enforcement</h4>
+            <p className="text-xs text-muted-foreground">
+              Releases marked as <em>Critical</em> (e.g., vital database migration or tax calculation fixes) automatically enforce an upgrade floor to ensure all branch workstations maintain database compatibility.
+            </p>
+          </div>
+        ),
+      },
+      {
+        id: "navigation-ergonomics",
+        category: "faq",
+        title: "Adaptive Sidebar Navigation & Ergonomics",
+        summary: "Dual-mode sidebar (expanded 288px vs 64px icon rail), accordion module groups, and layout controls.",
+        badge: "Interface",
+        content: (
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-slate-900 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-200 text-xs">
+              <strong>🖥️ Tailored for Counter Workstations:</strong> Mobile Shop ERP provides dual sidebar modes so you can maximize screen space for billing and repairs on compact POS monitors or enjoy full titles on ultra-wide counter displays.
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground flex items-center gap-2">
+              <PanelLeft size={16} className="text-primary" /> 1. Expanding &amp; Collapsing the Navigation Rail
+            </h4>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Expanded Mode (288px / w-72):</strong> Shows the full store name, enterprise tagline, module group accordions, and readable button labels.</li>
+                <li><strong>Icon Rail Mode (64px / w-16):</strong> Collapses the sidebar into an ultra-slim vertical icon rail with tooltips, giving 100% focus to POS cart tables and repair diagnostics.</li>
+                <li><strong>Persistent State:</strong> Your collapsed/expanded preference is automatically saved locally and remembered across restarts.</li>
+                <li><strong>How to Toggle:</strong> Click the <strong>Collapse / Expand</strong> button at the very bottom of the sidebar.</li>
+              </ul>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">2. Accordion Module Groups</h4>
+            <p className="text-xs text-muted-foreground">
+              To keep the interface clean during fast-paced retail operations, shop modules are organized into expandable categories: <em>Inventory, Sales &amp; Billing, Workshop, Accounts &amp; Ledgers, Analytics &amp; Reports,</em> and <em>System</em>. Click any section header to collapse or expand its items.
+            </p>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">3. Solid High-Contrast Architecture</h4>
+            <p className="text-xs text-muted-foreground">
+              The sidebar utilizes an opaque 100% solid background with luminous emerald active indicators, preventing readability issues or washed-out text under harsh showroom lights.
+            </p>
           </div>
         ),
       },

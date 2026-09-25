@@ -10,6 +10,9 @@
 - **Workstation Badging**: Updated the top status indicator to `Main Store · POS Terminal` for explicit cashier and store context.
 - **Expanded Action Targets**: Refined collapse/expand toggles and profile actions with generous tactile touch/click bounds.
 
+#### 📚 In-App Help Center & Operations Documentation
+- **Comprehensive Operations Guidance**: Added detailed in-app help topics and updated user manual documentation covering custom store logo uploads, receipt branding, executive profile dropdown, accidental sign-out safety guard, adaptive navigation ergonomics, and cryptographically signed multi-platform updates.
+
 ---
 
 ### Download Links

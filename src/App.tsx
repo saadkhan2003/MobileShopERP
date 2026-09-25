@@ -1289,29 +1289,40 @@ function App() {
       <aside
         data-testid="shop-sidebar"
         data-collapsed={sidebarCollapsed}
-        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground transition-all duration-200 ${sidebarCollapsed ? "w-16" : "w-72"}`}
+        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] select-none ${
+          sidebarCollapsed ? "w-16" : "w-60"
+        }`}
       >
-        <div className={`flex h-16 shrink-0 items-center gap-3.5 border-b border-border/40 ${sidebarCollapsed ? "px-3.5 justify-center" : "px-4"}`}>
-          <ShopLogo settings={settings} className="size-9 rounded-xl shadow-xs ring-1 ring-emerald-500/30" />
-          <div className={`min-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 ${sidebarCollapsed ? "max-w-0 opacity-0" : "max-w-full opacity-100"}`} aria-hidden={sidebarCollapsed}>
+        <div className="flex h-14 shrink-0 items-center px-4 border-b border-border/40 overflow-hidden">
+          <ShopLogo settings={settings} className="size-8 rounded-lg shadow-xs ring-1 ring-emerald-500/30 shrink-0" />
+          <div
+            className={`min-w-0 flex-1 ml-2.5 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+              sidebarCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
+            aria-hidden={sidebarCollapsed}
+          >
             <div className="text-sm font-bold tracking-tight text-foreground truncate">{settings.shop_name}</div>
             <div className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 truncate flex items-center gap-1.5 mt-0.5">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              <span>{settings.tagline || "Enterprise ERP"}</span>
+              <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="truncate">{settings.tagline || "Enterprise ERP"}</span>
             </div>
           </div>
         </div>
         <nav
           aria-label="Shop modules"
-          className={`flex-1 space-y-3 overflow-y-auto overflow-x-hidden py-4 ${sidebarCollapsed ? "px-2" : "px-3"}`}
+          className="flex-1 space-y-1 overflow-y-auto overflow-x-hidden py-3 px-2"
         >
           {menuGroups.map((group) => {
             const items = group.items.filter((key) => allowed(modules[key]));
             if (!items.length) return null;
             const open = sidebarCollapsed || openGroups.includes(group.title);
             return (
-              <div key={group.title} className={`menu-group py-0.5 ${sidebarCollapsed ? "border-b border-border/40 pb-2 mb-2 last:border-b-0" : ""}`}>
-                {!sidebarCollapsed && (
+              <div key={group.title} className="menu-group">
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    sidebarCollapsed ? "h-0 opacity-0 my-0 pointer-events-none" : "h-6 opacity-100 mt-2 mb-0.5"
+                  }`}
+                >
                   <button
                     type="button"
                     aria-expanded={open}
@@ -1323,20 +1334,28 @@ function App() {
                           : [...current, group.title],
                       )
                     }
-                    className="group flex w-full items-center justify-between rounded-md px-2.5 py-1 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground select-none cursor-pointer"
+                    className="group flex w-full items-center justify-between px-2 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground select-none cursor-pointer"
                   >
-                    <span>{group.title}</span>
+                    <span className="truncate">{group.title}</span>
                     <ChevronDown
-                      className={`size-3.5 text-muted-foreground/50 transition-transform duration-200 group-hover:text-foreground ${open ? "" : "-rotate-90"}`}
+                      className={`size-3 text-muted-foreground/40 transition-transform duration-200 group-hover:text-foreground shrink-0 ${
+                        open ? "" : "-rotate-90"
+                      }`}
                     />
                   </button>
-                )}
+                </div>
+                <div
+                  className={`transition-all duration-200 ${
+                    sidebarCollapsed ? "my-1.5 mx-auto h-px w-6 bg-border/40 opacity-100" : "h-0 opacity-0 overflow-hidden my-0"
+                  }`}
+                  aria-hidden="true"
+                />
                 <div
                   id={`menu-${group.title.replaceAll(" ", "-")}`}
                   aria-hidden={!open}
                   className={`menu-group-content ${open ? "is-open" : ""}`}
                 >
-                  <div className="min-h-0 overflow-hidden space-y-1 pt-1">
+                  <div className="min-h-0 overflow-hidden space-y-0.5 pt-0.5">
                     {items.map((key) => {
                       const x = modules[key];
                       const active = section === key;
@@ -1345,31 +1364,35 @@ function App() {
                           key={key}
                           type="button"
                           tabIndex={open ? 0 : -1}
-                          title={sidebarCollapsed ? x.title : undefined}
-                          aria-label={sidebarCollapsed ? x.title : undefined}
+                          title={x.title}
+                          aria-label={x.title}
                           aria-current={active ? "page" : undefined}
                           onClick={() => navigate(key)}
-                          className={`group flex h-10 w-full items-center gap-3 rounded-lg text-left text-[13px] transition-all duration-150 cursor-pointer ${
-                            sidebarCollapsed ? "justify-center px-0" : "px-3"
-                          } ${
+                          className={`group relative flex h-9 w-full items-center rounded-lg text-left text-xs transition-colors duration-150 cursor-pointer overflow-hidden px-2 ${
                             active
                               ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold ring-1 ring-emerald-500/25 shadow-2xs"
                               : "text-muted-foreground font-medium hover:bg-muted/70 hover:text-foreground"
                           }`}
                         >
-                          <span
-                            className={`shrink-0 transition-colors [&>svg]:size-[18px] ${
-                              active ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/80 group-hover:text-foreground"
+                          <div className="size-8 shrink-0 flex items-center justify-center">
+                            <span
+                              className={`transition-colors [&>svg]:size-[18px] ${
+                                active ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/80 group-hover:text-foreground"
+                              }`}
+                              aria-hidden="true"
+                            >
+                              {x.icon}
+                            </span>
+                          </div>
+                          <div
+                            className={`min-w-0 flex-1 ml-2 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+                              sidebarCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
                             }`}
-                            aria-hidden="true"
                           >
-                            {x.icon}
-                          </span>
-                          <span className={sidebarCollapsed ? "sr-only" : "truncate"}>
-                            {x.title}
-                          </span>
+                            <span className="truncate block">{x.title}</span>
+                          </div>
                           {!sidebarCollapsed && active && (
-                            <span className="ml-auto size-2 rounded-full bg-emerald-500 shadow-xs" />
+                            <span className="ml-auto size-1.5 rounded-full bg-emerald-500 shrink-0 shadow-xs mr-1" />
                           )}
                         </button>
                       );
@@ -1380,16 +1403,24 @@ function App() {
             );
           })}
         </nav>
-        <div className="border-t border-border/40 p-2.5">
+        <div className="border-t border-border/40 p-2">
           <Button
             variant="ghost"
             onClick={toggleSidebar}
             title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`w-full gap-2.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-lg h-9 text-xs font-medium ${sidebarCollapsed ? "justify-center px-0" : "justify-start px-3"}`}
+            className="group relative flex h-9 w-full items-center rounded-lg text-left text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground px-2 transition-colors cursor-pointer"
           >
-            {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
-            <span className={sidebarCollapsed ? "sr-only" : "text-xs"}>{sidebarCollapsed ? "Expand" : "Collapse"}</span>
+            <div className="size-8 shrink-0 flex items-center justify-center">
+              {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+            </div>
+            <div
+              className={`min-w-0 flex-1 ml-2 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+                sidebarCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+            >
+              <span className="truncate block">{sidebarCollapsed ? "Expand" : "Collapse"}</span>
+            </div>
           </Button>
         </div>
       </aside>

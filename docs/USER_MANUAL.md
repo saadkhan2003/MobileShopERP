@@ -11,6 +11,9 @@
 2. [System Architecture & Security](#2-system-architecture--security)
 3. [User Roles & Permissions](#3-user-roles--permissions)
 4. [First-Time Setup & Store Configuration](#4-first-time-setup--store-configuration)
+   - 4.1 Store Identity, Custom Logo & Tagline Branding
+   - 4.2 Executive Profile, Workstation Status & Sign-Out Safety Guard
+   - 4.3 Adaptive Sidebar Navigation (Expanded vs 64px Icon Rail)
 5. [Cash Register & Shift Management](#5-cash-register--shift-management)
 6. [Inventory & Stock Management](#6-inventory--stock-management)
    - 6.1 Box-Packed (New) Mobile Phones & IMEI Intake
@@ -44,7 +47,7 @@
     - 13.1 Daily One-Click Backups
     - 13.2 Database Restore Procedure
     - 13.3 Audit Trail & Security Logs
-    - 13.4 Automatic Software Updates
+    - 13.4 Cryptographically Signed Software Updates & Update Center
 14. [Frequently Asked Questions (FAQ) & Troubleshooting](#14-frequently-asked-questions-faq--troubleshooting)
 
 ---
@@ -93,8 +96,8 @@ Upon initial launch, follow these steps to configure your store's identity and r
 
 1. **Log In as Admin:** Enter the default credentials provided during system installation.
 2. **Navigate to Settings:** Click the **Settings** icon on the main navigation sidebar.
-3. **Configure Store Profile:**
-   - **Store Name:** Appears prominently at the top of receipts and invoices (e.g., *Khan Mobile & Repair Center*).
+3. **Configure Store Profile & Staff Accounts:**
+   - **Store Name & Tagline:** Appears prominently at the top of receipts, invoice PDFs, and sidebar branding (e.g., *Khan Mobile · Smartphone & Repair Hub*).
    - **Phone Numbers:** Contact numbers for customer support and warranty inquiries.
    - **Address:** Shop location, market name, and city printed on receipts.
    - **Tax / NTN (Optional):** Enter your sales tax or national tax number if applicable.
@@ -102,6 +105,23 @@ Upon initial launch, follow these steps to configure your store's identity and r
    - **Receipt Footer Note:** Custom greeting or terms (e.g., *"No returns without original receipt. Warranty void if seal is broken."*).
 4. **Set Up Branches (If Multi-Branch):** If your business operates multiple branches, go to **Branches** to register each branch location.
 5. **Create Staff Accounts:** Go to **Staff & Roles**, click **Add New Staff Member**, enter their username, role, initial PIN/password, and assign their default branch.
+
+### 4.1 Store Identity, Custom Logo & Tagline Branding
+Owners can completely customize the visual branding across customer invoices, sales tickets, and the application shell:
+- **Logo Upload:** Go to **Settings** > **Global Settings** > **Shop Logo**. Upload any high-resolution image (`PNG`, `JPEG`, or `WebP`, square or circular, up to 1 MB).
+- **Automated Brand Propagation:** Your logo and enterprise tagline immediately sync to the sidebar brand squircle, splash screen, invoice headers, repair job cards, and barcode labels.
+- **Receipt Customization:** Tailor the receipt footer message with your store's return and warranty policy.
+
+### 4.2 Executive Profile, Workstation Status & Sign-Out Safety Guard
+- **Executive Profile Dropdown:** The top-right header features an executive interactive badge showing user initials, username, and role (*Admin*, *Manager*, *Cashier*, or *Technician*).
+- **POS Terminal Badging:** The header status pill indicates the current station context (`Main Store · POS Terminal`) to ensure cashiers operate under the correct workstation.
+- **Accidental Sign-Out Safety Guard:** Clicking **Sign Out** triggers an explicit confirmation dialog (*"Are you sure you want to sign out? Any unsaved edits will be discarded"*). This prevents cashiers and managers from accidentally losing open checkout carts or uncommitted repair entries.
+
+### 4.3 Adaptive Sidebar Navigation (Expanded vs 64px Icon Rail)
+- **Dual-State Ergonomics:** The navigation sidebar can switch between an expanded 288px (`w-72`) menu and an ultra-compact 64px (`w-16`) icon rail with tooltip guidance.
+- **Persistent State:** The application remembers your collapsed/expanded preference across restarts.
+- **Collapsible Category Accordions:** Modules are logically grouped into *Inventory, Sales & Billing, Workshop, Accounts & Ledgers, Analytics & Reports*, and *System*. Click any category header to toggle visibility.
+- **High-Contrast Shell:** Built with a 100% solid opaque background to guarantee crisp readability under bright showroom lights.
 
 ---
 
@@ -367,10 +387,15 @@ If you replace your computer or need to recover from hardware failure:
 The system logs every critical action (price edits, manual stock adjustments, cash voids, deleted entries, logins):
 - Go to **Audit Trail** to inspect timestamps, operating user, branch, action type, and human-readable before/after details.
 
-### 13.4 Automatic Software Updates
-- When connected to the internet, the desktop app automatically checks for signed releases.
-- If a critical update is published, a notification prompts you to click **Update & Restart**.
-- Updates are cryptographically signed and applied without altering your existing database.
+### 13.4 Cryptographically Signed Software Updates & Update Center
+- **Automatic Checking:** The application routinely checks the official release feed:
+  - At application launch (if internet is available).
+  - Automatically every 30 minutes in the background.
+  - When the desktop window regains focus after 5 minutes of inactivity.
+- **Cryptographic Signatures:** Every package (Linux AppImage/deb, Windows EXE/MSI, macOS DMG/app) is cryptographically signed with private release keys. The update engine validates signatures before installation, preventing tampered payloads.
+- **In-App Update Banner:** When an update is ready, a clean notification banner appears with the version number and changelog summary.
+- **Zero Data Loss:** Updating the software executable never touches or alters your SQLite database file (`shop.db`). All products, invoices, and customer balances remain 100% intact.
+- **Critical Policy Enforcement:** If a release is flagged as *Critical* (e.g. schema migration), staff are prompted to update to preserve multi-station database integrity.
 
 ---
 
