@@ -12,6 +12,7 @@ import JsBarcode from "jsbarcode";
 import {
   Activity,
   BarChart3,
+  BookOpen,
   Boxes,
   Building2,
   CalendarClock,
@@ -20,6 +21,7 @@ import {
   ClipboardList,
   FileClock,
   HardDrive,
+  HelpCircle,
   History,
   LayoutDashboard,
   LogOut,
@@ -36,6 +38,7 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
+import { HelpCenter } from "./components/help/HelpCenter";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { PageHeader } from "./components/ui/page-header";
@@ -495,9 +498,16 @@ const modules: Record<string, Module> = {
     columns: ["date", "user_id", "action", "entity", "entity_id", "details"],
     icon: <FileClock />,
   },
+  help: {
+    title: "User Guide & Documentation",
+    description: "In-depth interactive manual for every feature and module",
+    path: "help",
+    columns: [],
+    icon: <BookOpen />,
+  },
 };
 const menuGroups = [
-  { title: "Overview", items: ["dashboard", "reports"] },
+  { title: "Overview", items: ["dashboard", "reports", "help"] },
   {
     title: "Inventory",
     items: ["products", "phones", "purchases", "used", "rates", "priceHistory"],
@@ -962,7 +972,7 @@ function App() {
     setSelected(null);
     try {
       const m = modules[section];
-      const result = ["ledger", "history", "search"].includes(section)
+      const result = ["ledger", "history", "search", "help"].includes(section)
         ? {}
         : await request<unknown>("GET", m.path);
       if (epoch !== loadEpoch.current || sectionRef.current !== section) return;
@@ -1295,20 +1305,7 @@ function App() {
             );
           })}
         </nav>
-        <div className={`border-t border-border/40 p-2 ${sidebarCollapsed ? "space-y-1" : ""}`}>
-          <div className={`overflow-hidden whitespace-nowrap px-2.5 py-2 text-xs ${sidebarCollapsed ? "sr-only" : ""}`}>
-            <div className="font-medium">{user?.name}</div>
-            <div className="capitalize text-muted-foreground">{user?.role}</div>
-          </div>
-          <Button
-            variant="ghost"
-            onClick={logout}
-            title={sidebarCollapsed ? "Sign out" : undefined}
-            aria-label={sidebarCollapsed ? "Sign out" : undefined}
-            className={`w-full gap-3 text-muted-foreground hover:text-destructive ${sidebarCollapsed ? "justify-center px-0" : "justify-start px-2.5"}`}
-          >
-            <LogOut size={16} /> <span className={sidebarCollapsed ? "sr-only" : ""}>Sign out</span>
-          </Button>
+        <div className="border-t border-border/40 p-2">
           <Button
             variant="ghost"
             onClick={toggleSidebar}
@@ -1332,9 +1329,45 @@ function App() {
             Local desktop database
             </span>
           </div>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-            ● Offline ready
-          </span>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => setSection("help")}
+            >
+              <HelpCircle size={15} />
+              <span>Help & Docs</span>
+            </Button>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+              ● Offline ready
+            </span>
+            {user && (
+              <>
+                <span className="h-4 border-l" aria-hidden="true" />
+                <div className="flex items-center gap-2 pl-1">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {user.name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                  <div className="hidden sm:block text-left text-xs leading-tight">
+                    <div className="font-medium text-foreground">{user.name}</div>
+                    <div className="capitalize text-[10px] text-muted-foreground">{user.role}</div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={logout}
+                    title="Sign out"
+                    aria-label="Sign out"
+                    className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <LogOut size={14} />
+                    <span className="hidden sm:inline">Sign out</span>
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         </header>
         <UpdateCenter />
         <div key={section} className="page-enter mx-auto max-w-7xl p-8">
@@ -1342,26 +1375,28 @@ function App() {
             title={m.title}
             description={m.description}
             action={
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => void load()}>
-                  Refresh
-                </Button>
-                {((simple.includes(section) &&
-                  (!["products", "rates"].includes(section) ||
-                    (user && roleLevel[user.role] >= 4)) &&
-                  (section !== "users" || user?.role === "owner")) ||
-                  ["purchases", "sales", "used"].includes(section)) && (
-                  <Button
-                    onClick={() => {
-                      setShowForm(!showForm);
-                      setForm({});
-                      setLines([]);
-                    }}
-                  >
-                    Add new
+              section === "help" ? null : (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => void load()}>
+                    Refresh
                   </Button>
-                )}
-              </div>
+                  {((simple.includes(section) &&
+                    (!["products", "rates"].includes(section) ||
+                      (user && roleLevel[user.role] >= 4)) &&
+                    (section !== "users" || user?.role === "owner")) ||
+                    ["purchases", "sales", "used"].includes(section)) && (
+                    <Button
+                      onClick={() => {
+                        setShowForm(!showForm);
+                        setForm({});
+                        setLines([]);
+                      }}
+                    >
+                      Add new
+                    </Button>
+                  )}
+                </div>
+              )
             }
           />
           {error && (
@@ -1541,6 +1576,9 @@ function App() {
           )}
           {section === "reports" && (
             <Reports data={data} request={request} setError={setError} />
+          )}
+          {section === "help" && (
+            <HelpCenter onNavigate={(sec) => setSection(sec)} />
           )}
           {section === "ledger" && (
             <LedgerPanel request={request} lookups={lookups} />

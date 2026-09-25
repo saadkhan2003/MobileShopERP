@@ -1,6 +1,6 @@
 {
-  "version": "0.4.0",
-  "critical": true,
+  "version": "0.4.1",
+  "critical": false,
   "minimum_version": "0.4.0",
-  "notes": "Critical Release 0.4.0: Comprehensive QA fixes for ledger balance reconciliation, repair spare parts tracking, local timezone formatting, duplicate IMEI validation, and cash session closing reports."
+  "notes": "Release 0.4.1: Adds integrated in-depth User Guide & Operations Help Center, relocated profile & sign-out header, responsive category navigation, and standalone password reset tool."
 }
