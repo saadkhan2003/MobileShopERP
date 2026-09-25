@@ -192,12 +192,13 @@ For items without factory barcodes (or used devices):
 
 The POS screen is optimized for lightning-fast checkout using either a barcode scanner or quick search.
 
-### 7.1 Scanning & Selecting Items
-1. Open **Point of Sale (POS)**.
-2. Place cursor in the **Scan / Search Bar**.
-3. Scan a product barcode or type an IMEI / product name.
-4. The item is instantly added to the active cart with its retail price and available stock displayed.
-5. Adjust quantity if selling multiple units (e.g., cables or screen protectors).
+### 7.1 Adding Items — With or Without a Barcode Scanner
+The system is built to work seamlessly whether you have dedicated retail hardware or just a standard keyboard and mouse:
+- **With a Barcode Scanner:** Place your cursor in the scan field and scan the barcode. The product is added instantly to your cart.
+- **Without a Barcode Scanner (Manual Typing):**
+  1. Type the numeric barcode or SKU code into the **"Scan barcode or enter SKU"** input box and press <kbd>Enter</kbd> or click the **Find** button.
+  2. Or, skip barcodes entirely: use the **Product Selector Dropdown** directly below the scan field. Start typing the phone model or accessory name (e.g., *Samsung A15*, *25W Fast Charger*, *AirPods Pro*) to select it directly.
+  3. **Selecting IMEIs for Phones:** When choosing a mobile phone handset, the system displays a dropdown list of all currently available in-stock IMEI numbers for that model. Simply click the IMEI you are selling, or type the 15 digits manually.
 
 ### 7.2 Customer Selection & Discounts
 - **Walk-in Customer:** Default for quick retail transactions.
@@ -213,10 +214,14 @@ Customers can pay using one or combined payment methods:
 - **Bank Transfer / Mobile Wallet:** JazzCash, EasyPaisa, or direct IBAN transfer.
 - **Credit (Udhaar):** Bill is posted to the customer's ledger for future recovery (requires selecting a registered customer).
 
-### 7.4 Printing Receipts
-Click **Complete Sale & Print**.
-- **80mm Thermal Receipt:** Optimized for rapid receipt printers with store header, itemized breakdown, IMEI numbers, warranty terms, and barcode.
-- **A4 / A5 Invoice:** Comprehensive formal invoice with full store tax details.
+### 7.4 Invoices & Receipts — With or Without a Physical Printer
+- **With a Physical Printer:**
+  - **80mm Thermal Receipt:** Click **Print Invoice** to output a compact slip with store header, itemized breakdown, IMEI numbers, and warranty terms.
+  - **A4 / A5 Invoices:** Supports standard laser or inkjet printers for formal corporate invoices.
+- **Without a Physical Printer (Digital & Paperless Mode):**
+  - **Save Digital PDF:** Click **Save PDF** to generate an official PDF file directly to your desktop. You can instantly send this PDF to the customer via **WhatsApp**, **Email**, or Bluetooth.
+  - **System Print to PDF:** Select *Microsoft Print to PDF* or *Save as PDF* from the print dialog.
+  - **100% Optional Printing:** You do **not** need to print receipts to complete transactions. Once you complete the sale, the sale is saved permanently in your database, your cash register is updated, inventory is deducted, and the invoice is archived in **Sales History** for anytime on-screen lookup.
 
 ---
 
