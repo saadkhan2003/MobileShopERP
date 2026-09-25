@@ -590,6 +590,9 @@ describe("desktop interface", () => {
     expect(
       screen.getByLabelText("Barcode CH-5").querySelectorAll("rect").length,
     ).toBeGreaterThan(0);
+    expect(screen.getByLabelText("Price")).toHaveValue(1500);
+    expect(screen.getByLabelText("Name")).toHaveValue("USB-C Charger");
+    await user.clear(screen.getByLabelText("Price"));
     await user.type(screen.getByLabelText("Price"), "1800");
     await user.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() =>

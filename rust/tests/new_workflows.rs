@@ -79,3 +79,64 @@ fn cash_report_for_new_open_session_shows_opening_balance(){
     assert_eq!(report["expected"],100.0);
     assert_eq!(report["variance"],Value::Null);
 }
+
+#[test]
+fn used_phone_seller_ledger_balance_includes_outstanding_purchase_balance(){
+    let (store,token,_dir)=setup();
+    let seller=call(&store,&token,"POST","/api/contacts",json!({"kind":"customer","name":"Used Phone Seller"}))["id"].as_i64().unwrap();
+    let model=call(&store,&token,"POST","/api/products",json!({"name":"iPhone 13","category":"phone","cost":50000,"price":65000}))["id"].as_i64().unwrap();
+    let purchase=call(&store,&token,"POST","/api/used-purchases",json!({
+        "customer_id":seller,
+        "product_id":model,
+        "agreed_price":50000,
+        "paid":20000,
+        "imei1":"860000000000999"
+    }));
+    let purchase_id=purchase["id"].as_i64().unwrap();
+    let ledger=call(&store,&token,"GET","/api/ledger",json!({"kind":"customer","contact_id":seller}));
+    assert_eq!(ledger["balance"],30000.0);
+    assert_eq!(ledger["transactions"][0]["type"],"used_purchase");
+    assert_eq!(ledger["transactions"][0]["amount"],50000.0);
+    assert_eq!(ledger["transactions"][0]["paid"],20000.0);
+    assert_eq!(ledger["payments"][0]["direction"],"out");
+    assert_eq!(ledger["payments"][0]["amount"],20000.0);
+
+    // Pay another 15000
+    call(&store,&token,"POST",&format!("/api/used-purchases/{purchase_id}/pay"),json!({"amount":15000,"method":"cash"}));
+    let ledger2=call(&store,&token,"GET","/api/ledger",json!({"kind":"customer","contact_id":seller}));
+    assert_eq!(ledger2["balance"],15000.0);
+}
+
+#[test]
+fn repair_details_returns_consumed_spare_parts(){
+    let (store,token,_dir)=setup();
+    let customer=call(&store,&token,"POST","/api/contacts",json!({"kind":"customer","name":"Repair Customer"}))["id"].as_i64().unwrap();
+    let battery=call(&store,&token,"POST","/api/products",json!({"name":"QA Spare Battery","category":"spare_part","cost":1200,"price":2000}))["id"].as_i64().unwrap();
+    call(&store,&token,"POST","/api/purchases",json!({"lines":[{"product_id":battery,"quantity":5,"unit_cost":1200}]}));
+    let repair=call(&store,&token,"POST","/api/repairs",json!({
+        "customer_id":customer,
+        "model":"Galaxy S21",
+        "fault":"Battery draining quickly",
+        "labor_charge":2000,
+        "other_cost":500
+    }));
+    let repair_id=repair["id"].as_i64().unwrap();
+
+    // Consume 1 battery
+    call(&store,&token,"POST",&format!("/api/repairs/{repair_id}/parts"),json!({"product_id":battery,"quantity":1}));
+    let details=call(&store,&token,"GET",&format!("/api/repairs/{repair_id}"),json!({}));
+    assert_eq!(details["parts"].as_array().unwrap().len(),1);
+    assert_eq!(details["parts"][0]["product_name"],"QA Spare Battery");
+    assert_eq!(details["parts"][0]["quantity"],1);
+    assert_eq!(details["parts"][0]["unit_cost"],1200.0);
+}
+
+#[test]
+fn duplicate_imei_returns_clear_error(){
+    let (store,token,_dir)=setup();
+    let model=call(&store,&token,"POST","/api/products",json!({"name":"Pixel 7","category":"phone","cost":30000,"price":45000}))["id"].as_i64().unwrap();
+    call(&store,&token,"POST","/api/purchases",json!({"lines":[{"product_id":model,"unit_cost":30000,"imeis":[{"imei1":"860000000000001"}]}]}));
+    let err=store.handle("POST","/api/purchases",&json!({"lines":[{"product_id":model,"unit_cost":30000,"imeis":[{"imei1":"860000000000001"}]}]}),&token).unwrap_err();
+    assert!(err.to_string().contains("already exists"), "expected duplicate IMEI error, got {err}");
+}
+

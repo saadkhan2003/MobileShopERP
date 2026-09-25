@@ -54,6 +54,7 @@ import { SearchSelect } from "./components/ui/search-select";
 import { ReportCharts } from "./components/reports/ReportCharts";
 import { UpdateCenter } from "./components/updates/UpdateCenter";
 import { saveInvoicePdf, saveRepairPdf } from "./lib/pdf";
+import { formatDateTime } from "./lib/utils";
 import {
   DEFAULT_SHOP_SETTINGS,
   GlobalSettings,
@@ -182,6 +183,7 @@ const modules: Record<string, Module> = {
     description: "Individually tracked phones and trade-ins",
     path: "phones",
     columns: [
+      "id",
       "product_name",
       "imei1",
       "imei2",
@@ -212,7 +214,7 @@ const modules: Record<string, Module> = {
     title: "Sales & invoices",
     description: "Retail checkout and invoices",
     path: "sales",
-    columns: ["invoice_no", "customer", "total", "paid", "date"],
+    columns: ["id", "invoice_no", "customer", "total", "paid", "date"],
     icon: <ReceiptText />,
   },
   installments: {
@@ -228,6 +230,7 @@ const modules: Record<string, Module> = {
     description: "Customer handoff and spare parts",
     path: "repairs",
     columns: [
+      "id",
       "job_no",
       "customer",
       "model",
@@ -743,6 +746,74 @@ function ProductEntryFields({
     </div>
   );
 }
+
+function formatAuditDetails(action: string, entity: string, details: unknown): string {
+  if (details == null || details === "" || details === "{}") return "—";
+  let obj: Record<string, unknown> = {};
+  if (typeof details === "string") {
+    try {
+      obj = JSON.parse(details);
+    } catch {
+      return details;
+    }
+  } else if (typeof details === "object") {
+    obj = details as Record<string, unknown>;
+  } else {
+    return String(details);
+  }
+
+  if (Object.keys(obj).length === 0) return "—";
+
+  if (action === "restore" && obj.name) {
+    return `Restored from ${obj.name}${obj.safety ? ` (safety: ${obj.safety})` : ""}`;
+  }
+  if (action === "update" && entity === "shop_settings") {
+    const parts = [];
+    if (obj.shop_name) parts.push(`Shop: ${obj.shop_name}`);
+    if (obj.logo_changed) parts.push("Logo updated");
+    return parts.length ? parts.join(", ") : "Updated shop settings";
+  }
+  if (action === "update" && entity === "repair") {
+    if (obj.status) {
+      return `Status changed to ${obj.status}${obj.labor_charge != null ? ` (Labor: Rs ${obj.labor_charge})` : ""}`;
+    }
+    const changes = Object.entries(obj).map(([k, v]) => `${k.replaceAll("_", " ")}: ${v}`).join(", ");
+    return changes || "Updated repair";
+  }
+  if (action === "consume_part") {
+    return `Consumed spare part (qty: ${obj.qty ?? 1})`;
+  }
+  if (action === "create" && entity === "payment") {
+    return `Payment recorded: ${money(obj.amount)}${obj.method ? ` via ${obj.method}` : ""}`;
+  }
+  if (action === "create" && entity === "used_purchase") {
+    return `Purchased used phone (ID #${obj.phone || "—"})`;
+  }
+  if (action === "return" && entity === "sale") {
+    return `Customer return recorded (refund: ${money(obj.refund)}, qty: ${obj.quantity ?? 1})`;
+  }
+  if (action === "update" && entity === "backup_preferences") {
+    return `Backup schedule: ${obj.enabled ? `every ${obj.interval_hours}h` : "disabled"}`;
+  }
+  if (action === "open" && entity === "cash") {
+    return "Opened cash register";
+  }
+  if (action === "close" && entity === "cash") {
+    return `Closed cash register (expected: ${money(obj.expected)})`;
+  }
+  if (action === "create") {
+    return `Created ${entity.replace("_", " ")}`;
+  }
+  if (action === "update" && entity === "product") {
+    const fields = Object.keys(obj).filter(k => k !== "id");
+    return fields.length ? `Updated ${fields.join(", ")}` : "Updated product";
+  }
+
+  return Object.entries(obj)
+    .map(([k, v]) => `${k.replaceAll("_", " ")}: ${typeof v === "object" ? JSON.stringify(v) : String(v)}`)
+    .join("; ");
+}
+
 function Grid({
   rows,
   columns,
@@ -788,6 +859,10 @@ function Grid({
                         >
                           {text(r[c])}
                         </Badge>
+                      ) : c === "details" ? (
+                        <span title={typeof r[c] === "string" ? r[c] : JSON.stringify(r[c])}>
+                          {formatAuditDetails(String(r.action ?? ""), String(r.entity ?? ""), r[c])}
+                        </span>
                       ) : [
                           "price",
                           "cost",
@@ -807,6 +882,17 @@ function Grid({
                           "new_price",
                         ].includes(c) ? (
                         money(r[c])
+                      ) : [
+                          "date",
+                          "created_at",
+                          "opened_at",
+                          "closed_at",
+                          "paid_at",
+                          "delivered_at",
+                          "updated_at",
+                          "day",
+                        ].includes(c) ? (
+                        formatDateTime(r[c])
                       ) : (
                         text(r[c])
                       )}
@@ -1005,7 +1091,9 @@ function App() {
       setLines([]);
       await load();
     } catch (e) {
-      setError(String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      throw e;
     } finally {
       setBusy(false);
     }
@@ -1123,6 +1211,8 @@ function App() {
   };
   const navigate = (key: string) => {
     setSection(key);
+    setRows([]);
+    setSelected(null);
     const group = menuGroups.find((item) => item.items.includes(key));
     if (group)
       setOpenGroups((current) =>
@@ -1589,21 +1679,59 @@ function TransactionForm({
 }) {
   const isSale = kind === "sale";
   const [payments, setPayments] = useState<Row[]>([]);
+  const [formError, setFormError] = useState("");
   const product = lookups.products?.find(
     (p) => String(p.id) === String(line.product_id),
   );
-  const pickProduct = (picked: Row) =>
+  const pickProduct = (picked: Row) => {
+    setFormError("");
     setLine({
       product_id: String(picked.id),
       unit_price: picked.price,
       unit_cost: picked.cost,
       scan: "",
     });
+  };
   const add = () => {
     if (!product) return;
     const phone = String(product.category) === "phone";
     if (phone && isSale && !line.phone_id) return;
-    if (phone && !isSale && !line.imei1) return;
+    if (phone && !isSale) {
+      const im1 = String(line.imei1 ?? "").trim();
+      const im2 = String(line.imei2 ?? "").trim();
+      if (!im1) {
+        setFormError("IMEI 1 is required for handsets");
+        return;
+      }
+      if (im1.length !== 15 || !/^\d+$/.test(im1)) {
+        setFormError("IMEI 1 must contain exactly 15 digits");
+        return;
+      }
+      if (im2 && (im2.length !== 15 || !/^\d+$/.test(im2))) {
+        setFormError("IMEI 2 must contain exactly 15 digits");
+        return;
+      }
+      if (im2 && im1 === im2) {
+        setFormError("IMEI 1 and IMEI 2 must differ");
+        return;
+      }
+      const existing = lookups.phones?.find(
+        (p) => p.imei1 === im1 || p.imei2 === im1 || (im2 && (p.imei1 === im2 || p.imei2 === im2)),
+      );
+      if (existing) {
+        const dup = (existing.imei1 === im1 || existing.imei2 === im1) ? im1 : im2;
+        setFormError(`IMEI already exists in inventory: ${dup}`);
+        return;
+      }
+      const inCurrentLines = lines.some((l) =>
+        (l.imeis as Row[])?.some((h) => h.imei1 === im1 || h.imei2 === im1 || (im2 && (h.imei1 === im2 || h.imei2 === im2))),
+      );
+      if (inCurrentLines) {
+        setFormError(`IMEI already added to this purchase: ${im1}`);
+        return;
+      }
+    }
+    setFormError("");
     setLines([
       ...lines,
       phone && !isSale
@@ -1639,6 +1767,14 @@ function TransactionForm({
         <CardTitle>{isSale ? "New sale" : "Receive stock"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        {formError && (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          >
+            {formError}
+          </div>
+        )}
         <FormFields
           fields={
             isSale
@@ -1955,9 +2091,18 @@ function TransactionForm({
             </CardContent>
           </Card>
         )}
+        {formError && (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          >
+            {formError}
+          </div>
+        )}
         <Button
           disabled={busy || lines.length === 0}
-          onClick={() => {
+          onClick={async () => {
+            setFormError("");
             const body: Row = { ...form, lines };
             if (isSale) {
               body.payments = payments;
@@ -1984,7 +2129,11 @@ function TransactionForm({
               delete body.trade_box_included;
               delete body.trade_charger_included;
             }
-            void submit(isSale ? "sales" : "purchases", body);
+            try {
+              await submit(isSale ? "sales" : "purchases", body);
+            } catch (err: unknown) {
+              setFormError(err instanceof Error ? err.message : String(err));
+            }
           }}
         >
           {isSale ? "Complete sale" : "Save purchase"}
@@ -2015,12 +2164,41 @@ function Details({
   const [detail, setDetail] = useState<Row | null>(null);
   const [purchaseLines, setPurchaseLines] = useState<Row[]>([]);
   const [form, setForm] = useState<Row>({});
+  const [partForm, setPartForm] = useState<Row>({ part_id: "", part_quantity: 1 });
   const [returnForm, setReturnForm] = useState<Row>({ quantity: 1, refund_method: "cash", restock: true });
   useEffect(() => {
     setDetail(null);
     setPurchaseLines([]);
-    setForm({});
     setReturnForm({ quantity: 1, refund_method: "cash", restock: true });
+    setPartForm({ part_id: "", part_quantity: 1 });
+    if (section === "products") {
+      setForm({
+        name: row.name ?? "",
+        price: row.price ?? 0,
+        cost: row.cost ?? 0,
+        min_price: row.min_price ?? 0,
+        reorder_level: row.reorder_level ?? 0,
+      });
+    } else if (section === "repairs") {
+      setForm({
+        status: row.status ?? "Received",
+        labor_charge: row.labor_charge ?? 0,
+        other_cost: row.other_cost ?? 0,
+        technician_id: row.technician_id ?? "",
+        expected_date: row.expected_date ?? "",
+      });
+      request<Row>("GET", `repairs/${row.id}`)
+        .then(setDetail)
+        .catch(() => {});
+    } else if (section === "warranties") {
+      setForm({
+        status: row.status ?? "open",
+        action: row.action ?? "",
+        result: row.result ?? "",
+      });
+    } else {
+      setForm({});
+    }
     if (section === "sales")
       request<Row>("GET", `sales/${row.id}`)
         .then(setDetail)
@@ -2176,9 +2354,39 @@ function Details({
                 "warranty_days",
               ]}
             />
-            <div className="flex gap-6 text-sm">
-              <span>Total {money(detail.total)}</span>
-              <span>Paid {money(detail.paid)}</span>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border p-4 bg-muted/20">
+              <div>
+                <div className="text-xs text-muted-foreground">Subtotal</div>
+                <div className="mt-1 text-base font-semibold">{money(detail.subtotal)}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Discount</div>
+                <div className="mt-1 text-base font-semibold text-emerald-600">
+                  {Number(detail.discount) > 0 ? `-${money(detail.discount)}` : money(detail.discount)}
+                </div>
+              </div>
+              {Number(detail.trade_in_value) > 0 && (
+                <div>
+                  <div className="text-xs text-muted-foreground">Trade-in</div>
+                  <div className="mt-1 text-base font-semibold text-emerald-600">
+                    -{money(detail.trade_in_value)}
+                  </div>
+                </div>
+              )}
+              <div>
+                <div className="text-xs text-muted-foreground">Total</div>
+                <div className="mt-1 text-lg font-bold">{money(detail.total)}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Paid</div>
+                <div className="mt-1 text-base font-semibold">{money(detail.paid)}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Balance</div>
+                <div className="mt-1 text-base font-semibold text-amber-600">
+                  {money(detail.balance ?? (Number(detail.total) - Number(detail.paid)))}
+                </div>
+              </div>
             </div>
             <Receipt sale={detail} settings={settings} />
             <div className="flex flex-wrap gap-2">
@@ -2220,6 +2428,19 @@ function Details({
             </Button>
           </>
         )}
+        {section === "repairs" && (
+          <div className="space-y-3">
+            <h3 className="font-medium">Consumed spare parts</h3>
+            {(detail?.parts as Row[] | undefined)?.length ? (
+              <Grid
+                rows={detail!.parts as Row[]}
+                columns={["product_name", "sku", "quantity", "unit_cost"]}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">No spare parts consumed for this repair.</p>
+            )}
+          </div>
+        )}
         {section === "repairs" && row.status === "Ready" && (
           <Button
             variant="outline"
@@ -2232,7 +2453,18 @@ function Details({
             Copy ready message
           </Button>
         )}
-        {section === "repairs" && <Button variant="outline" onClick={() => void saveRepairPdf(row, settings).catch((e) => window.alert(String(e)))}>Save PDF job card</Button>}
+        {section === "repairs" && (
+          <Button
+            variant="outline"
+            onClick={() =>
+              void saveRepairPdf(detail || row, settings).catch((e) =>
+                window.alert(String(e)),
+              )
+            }
+          >
+            Save PDF job card
+          </Button>
+        )}
         {edit && (
           <form
             onSubmit={(e) => {
@@ -2261,8 +2493,11 @@ function Details({
             onSubmit={(e) => {
               e.preventDefault();
               void submit(`repairs/${row.id}/parts`, {
-                product_id: Number(form.part_id),
-                quantity: Number(form.part_quantity),
+                product_id: Number(partForm.part_id),
+                quantity: Number(partForm.part_quantity || 1),
+              }).then(() => {
+                setPartForm({ part_id: "", part_quantity: 1 });
+                request<Row>("GET", `repairs/${row.id}`).then(setDetail);
               });
             }}
             className="space-y-4 border-t pt-4"
@@ -2273,8 +2508,8 @@ function Details({
                 { key: "part_id", label: "Spare part", source: "products" },
                 { key: "part_quantity", label: "Quantity", type: "number" },
               ]}
-              value={form}
-              setValue={setForm}
+              value={partForm}
+              setValue={setPartForm}
               lookups={lookups}
             />
             <Button type="submit" variant="outline" disabled={busy}>
@@ -2431,14 +2666,36 @@ function CashPanel({
   const [reportError, setReportError] = useState("");
   const loadCashReport = useCallback((id: string) => {
     if (!id) return;
-    request<Row>("GET", `cash/${id}/report`).then((result) => {setReport(result);setReportError("");}).catch((e) => {setReport(null);setReportError(String(e));});
+    request<Row>("GET", `cash/${id}/report`)
+      .then((result) => {
+        setReport(result);
+        setReportError("");
+      })
+      .catch((e) => {
+        setReport(null);
+        setReportError(String(e));
+      });
   }, [request]);
+
   useEffect(() => {
-    if (!sessionId && rows.length) setSessionId(String(rows[0].id));
+    if (!rows.length) {
+      setSessionId("");
+      setReport(null);
+      setReportError("");
+      return;
+    }
+    const found = rows.some((r) => String(r.id) === sessionId);
+    if (!found) {
+      setSessionId(String(rows[0].id));
+    }
   }, [rows, sessionId]);
+
   useEffect(() => {
-    loadCashReport(sessionId);
+    if (sessionId && rows.some((r) => String(r.id) === sessionId)) {
+      loadCashReport(sessionId);
+    }
   }, [sessionId, rows, loadCashReport]);
+
   return (
     <div className="mt-5 space-y-5"><Card>
       <CardHeader>
@@ -2473,7 +2730,33 @@ function CashPanel({
       </CardContent>
     </Card>
     <Card><CardHeader><CardTitle>Daily closing report</CardTitle></CardHeader><CardContent className="space-y-4">
-      <div className="flex items-end gap-2"><div><Label>Cash session</Label><select aria-label="Cash session" className="h-10 rounded-lg border bg-background px-3" value={sessionId} onChange={(e) => setSessionId(e.target.value)}>{rows.map((session) => <option key={String(session.id)} value={String(session.id)}>{text(session.opened_at)} · #{text(session.id)}</option>)}</select></div><Button variant="outline" disabled={!sessionId} onClick={() => loadCashReport(sessionId)}>Load report</Button></div>
+      <div className="flex items-end gap-2">
+        <div>
+          <Label>Cash session</Label>
+          <select
+            aria-label="Cash session"
+            className="h-10 rounded-lg border bg-background px-3"
+            value={sessionId}
+            onChange={(e) => {
+              setSessionId(e.target.value);
+              setReportError("");
+            }}
+          >
+            {rows.map((session) => (
+              <option key={String(session.id)} value={String(session.id)}>
+                {formatDateTime(session.opened_at)} · #{text(session.id)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button
+          variant="outline"
+          disabled={!sessionId || !rows.some((r) => String(r.id) === sessionId)}
+          onClick={() => loadCashReport(sessionId)}
+        >
+          Load report
+        </Button>
+      </div>
       {reportError && <p role="alert" className="text-sm text-red-700">{reportError}</p>}
       {report && <>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -3015,6 +3298,176 @@ function BackupPanel({
     </Card>
   );
 }
+function ImeiHistoryView({ result }: { result: Row }) {
+  const phone = (result.phone as Row) ?? {};
+  const sale = result.sale as Row | null;
+  const warranty = (result.warranty as Row[]) ?? [];
+  const repairs = (result.repairs as Row[]) ?? [];
+  const movements = (result.movements as Row[]) ?? [];
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-bold">
+              {text(phone.product_name) || "Handset details"}
+            </CardTitle>
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
+                phone.status === "available"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : phone.status === "sold"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              {text(phone.status || "Unknown")}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="text-xs text-muted-foreground">Primary IMEI (IMEI 1)</div>
+              <div className="mt-1 font-mono text-sm font-medium">{text(phone.imei1)}</div>
+            </div>
+            {phone.imei2 ? (
+              <div>
+                <div className="text-xs text-muted-foreground">Secondary IMEI (IMEI 2)</div>
+                <div className="mt-1 font-mono text-sm font-medium">{text(phone.imei2)}</div>
+              </div>
+            ) : null}
+            <div>
+              <div className="text-xs text-muted-foreground">PTA Status</div>
+              <div className="mt-1 text-sm font-medium">{text(phone.pta_status) || "N/A"}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Condition Grade</div>
+              <div className="mt-1 text-sm font-medium">{text(phone.condition_grade) || "N/A"}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Purchase Date</div>
+              <div className="mt-1 text-sm font-medium">{formatDateTime(phone.purchase_date)}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Supplier / Source</div>
+              <div className="mt-1 text-sm font-medium">{text(phone.supplier_name) || "N/A"}</div>
+            </div>
+            {phone.purchase_cost != null && (
+              <div>
+                <div className="text-xs text-muted-foreground">Purchase Cost</div>
+                <div className="mt-1 text-sm font-medium">{money(phone.purchase_cost)}</div>
+              </div>
+            )}
+            {phone.prep_cost != null && Number(phone.prep_cost) > 0 && (
+              <div>
+                <div className="text-xs text-muted-foreground">Prep / Refurb Cost</div>
+                <div className="mt-1 text-sm font-medium">{money(phone.prep_cost)}</div>
+              </div>
+            )}
+            <div>
+              <div className="text-xs text-muted-foreground">Box & Charger</div>
+              <div className="mt-1 text-sm font-medium">
+                {phone.box_included ? "Box Included" : "No Box"} · {phone.charger_included ? "Charger Included" : "No Charger"}
+              </div>
+            </div>
+          </div>
+          {phone.notes ? (
+            <div className="mt-4 rounded-lg bg-muted/40 p-3 text-sm">
+              <span className="font-medium text-muted-foreground">Notes: </span>
+              {text(phone.notes)}
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <div>
+        <h2 className="mb-2 font-medium">Sale & Customer Information</h2>
+        {sale ? (
+          <Card>
+            <CardContent className="p-5">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <div className="text-xs text-muted-foreground">Invoice No</div>
+                  <div className="mt-1 font-semibold text-primary">{text(sale.invoice_no)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Sale Date</div>
+                  <div className="mt-1 text-sm">{formatDateTime(sale.date)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Customer</div>
+                  <div className="mt-1 text-sm font-medium">{text(sale.customer) || "Walk-in customer"}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Customer Phone</div>
+                  <div className="mt-1 text-sm">{text(sale.customer_phone) || "N/A"}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Sale Total</div>
+                  <div className="mt-1 text-base font-semibold">{money(sale.total)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Amount Paid</div>
+                  <div className="mt-1 text-base font-semibold">{money(sale.paid)}</div>
+                </div>
+                {Number(sale.discount) > 0 && (
+                  <div>
+                    <div className="text-xs text-muted-foreground">Discount Applied</div>
+                    <div className="mt-1 text-base font-semibold text-emerald-600">-{money(sale.discount)}</div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-xs text-muted-foreground">Payment Status</div>
+                  <div className="mt-1 text-sm font-medium capitalize">{text(sale.status)}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="rounded-xl border p-4 text-sm text-muted-foreground">
+            This phone has not been sold yet (currently in available inventory).
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-medium">Warranty Claims</h2>
+        {warranty.length ? (
+          <Grid rows={warranty} columns={["date", "issue", "status", "action", "result"]} />
+        ) : (
+          <div className="rounded-xl border p-4 text-sm text-muted-foreground">
+            No warranty claims on record for this handset.
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-medium">Repairs</h2>
+        {repairs.length ? (
+          <Grid rows={repairs} columns={["job_no", "fault", "status", "labor_charge", "date"]} />
+        ) : (
+          <div className="rounded-xl border p-4 text-sm text-muted-foreground">
+            No repair jobs on record for this handset.
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-medium">Stock Movements</h2>
+        {movements.length ? (
+          <Grid rows={movements} columns={["date", "reason", "delta"]} />
+        ) : (
+          <div className="rounded-xl border p-4 text-sm text-muted-foreground">
+            No stock movements recorded for this handset.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SearchPanel({
   kind,
   term,
@@ -3056,29 +3509,7 @@ function SearchPanel({
       {error && <div className="text-sm text-red-600">{error}</div>}
       {result &&
         (kind === "history" ? (
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="p-5">
-                <pre className="whitespace-pre-wrap text-sm">
-                  {JSON.stringify(result.phone, null, 2)}
-                </pre>
-              </CardContent>
-            </Card>
-            {(["sale", "warranty", "repairs", "movements"] as const).map(
-              (key) => (
-                <div key={key}>
-                  <h2 className="mb-2 font-medium capitalize">{key}</h2>
-                  <Card>
-                    <CardContent className="p-4">
-                      <pre className="whitespace-pre-wrap text-xs">
-                        {JSON.stringify(result[key], null, 2)}
-                      </pre>
-                    </CardContent>
-                  </Card>
-                </div>
-              ),
-            )}
-          </div>
+          <ImeiHistoryView result={result} />
         ) : (
           <div className="space-y-6">
             {(["products", "phones", "sales", "contacts"] as const).map(

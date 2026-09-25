@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { PDFDocument, StandardFonts, rgb, type PDFPage, type PDFFont } from "pdf-lib";
 import type { ShopSettings } from "../components/settings/GlobalSettings";
+import { formatDateTime } from "./utils";
 
 type Row = Record<string, unknown>;
 const clean = (value: unknown) => String(value ?? "").replace(/[^\x20-\x7E]/g, "?");
@@ -53,7 +54,7 @@ export async function saveInvoicePdf(sale: Row, settings: ShopSettings) {
   let currentPage = page;
   let y = 680;
   y = line(currentPage, font, "Invoice", sale.invoice_no, y);
-  y = line(currentPage, font, "Date", sale.date, y);
+  y = line(currentPage, font, "Date", formatDateTime(sale.date), y);
   y = line(currentPage, font, "Customer", sale.customer || "Walk-in", y);
   y = line(currentPage, font, "Phone", sale.customer_phone, y) - 12;
   currentPage.drawText("Item", { x: 48, y, font: bold, size: 10 });
@@ -91,14 +92,40 @@ export async function saveRepairPdf(repair: Row, settings: ShopSettings) {
   const { doc, page, font, bold } = await documentBase(settings, "REPAIR JOB CARD");
   let y = 680;
   const fields: [string, unknown][] = [
-    ["Job", repair.job_no], ["Received", repair.date], ["Customer", repair.customer],
+    ["Job", repair.job_no], ["Received", formatDateTime(repair.date)], ["Customer", repair.customer],
     ["Phone", repair.phone], ["Model", repair.model], ["IMEI", repair.imei],
     ["Fault", repair.fault], ["Condition", repair.condition_notes],
-    ["Accessories", repair.received_accessories], ["Expected", repair.expected_date],
+    ["Accessories", repair.received_accessories], ["Expected", formatDateTime(repair.expected_date)],
     ["Status", repair.status], ["Labor", currency(repair.labor_charge)],
   ];
   for (const [label, value] of fields) y = line(page, font, label, value, y);
-  y -= 35;
+
+  const parts = (repair.parts as Row[] | undefined) ?? [];
+  if (parts.length) {
+    y -= 6;
+    page.drawText("Consumed / Replacement Parts:", { x: 48, y, font: bold, size: 10 });
+    y -= 16;
+    page.drawText("Part", { x: 48, y, font: bold, size: 9 });
+    page.drawText("Qty", { x: 340, y, font: bold, size: 9 });
+    page.drawText("Unit Cost", { x: 400, y, font: bold, size: 9 });
+    page.drawText("Total", { x: 480, y, font: bold, size: 9 });
+    y -= 14;
+    for (const part of parts) {
+      const partName = clean(part.product_name || part.name || part.sku).slice(0, 38);
+      const qty = Number(part.quantity ?? 1);
+      const unitCost = Number(part.unit_cost ?? 0);
+      page.drawText(partName, { x: 48, y, font, size: 9 });
+      page.drawText(String(qty), { x: 340, y, font, size: 9 });
+      page.drawText(currency(unitCost), { x: 400, y, font, size: 9 });
+      page.drawText(currency(qty * unitCost), { x: 480, y, font, size: 9 });
+      y -= 14;
+    }
+    if (Number(repair.parts_cost ?? 0) > 0) {
+      y = line(page, bold, "Parts Total", currency(repair.parts_cost), y);
+    }
+  }
+
+  y -= 25;
   page.drawText("Customer signature: __________________________", { x: 48, y, font: bold, size: 10 });
   page.drawText(clean(settings.receipt_footer).slice(0, 95), { x: 48, y: 65, font, size: 9 });
   return persist(doc, `${clean(repair.job_no) || "repair"}.pdf`);

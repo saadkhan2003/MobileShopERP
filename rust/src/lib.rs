@@ -39,10 +39,14 @@ impl From<rusqlite::Error> for ApiError {
     fn from(e: rusqlite::Error) -> Self {
         let msg = e.to_string();
         if msg.contains("UNIQUE constraint failed") {
-            err(
-                409,
-                "A record with this SKU, barcode or IMEI already exists",
-            )
+            if msg.contains("phones.imei1") || msg.contains("phones.imei2") {
+                err(409, "A phone with this IMEI already exists")
+            } else {
+                err(
+                    409,
+                    "A record with this SKU, barcode or IMEI already exists",
+                )
+            }
         } else if msg.contains("FOREIGN KEY constraint failed") {
             err(400, "Referenced record is invalid")
         } else {
@@ -637,6 +641,7 @@ impl Store {
                 "SELECT r.*,c.name customer,c.phone,u.name technician FROM repairs r LEFT JOIN contacts c ON c.id=r.customer_id LEFT JOIN users u ON u.id=r.technician_id ORDER BY r.id DESC",
                 &[]
             )?)),
+            ("GET", ["repairs", repair_id]) => self.repair_details(db, repair_id, user),
             ("POST", ["repairs"]) => self.create_repair(db, body, user),
             ("PATCH", ["repairs", repair_id]) => self.update_repair(db, repair_id, body, user),
             ("POST", ["repairs", repair_id, "parts"]) => {
@@ -1692,6 +1697,7 @@ impl Store {
                 &[v(&c, "id").clone()],
             )?;
             x.extend(query(db,"SELECT date,job_no reference,labor_charge+parts_cost amount,paid,'repair' type FROM repairs WHERE customer_id=?",&[v(&c,"id").clone()])?);
+            x.extend(query(db,"SELECT u.date, ('USED-' || u.id) reference, u.agreed_price amount, u.paid, 'used_purchase' type FROM used_purchases u WHERE u.customer_id=?",&[v(&c,"id").clone()])?);
             x
         } else {
             query(
@@ -1701,16 +1707,50 @@ impl Store {
             )?
         };
         transactions.sort_by_key(|b| std::cmp::Reverse(s(b, "date")));
-        let balance = money(
-            transactions
+        let balance = if kind == "customer" {
+            let sales_repairs_unpaid: f64 = transactions
                 .iter()
+                .filter(|t| s(t, "type") != "used_purchase")
                 .map(|t| n(t, "amount") - n(t, "paid"))
-                .sum(),
-            "Balance",
-        )?;
+                .sum();
+            let used_unpaid: f64 = transactions
+                .iter()
+                .filter(|t| s(t, "type") == "used_purchase")
+                .map(|t| n(t, "amount") - n(t, "paid"))
+                .sum();
+            let net = if sales_repairs_unpaid == 0.0 && used_unpaid > 0.0 {
+                used_unpaid
+            } else {
+                sales_repairs_unpaid - used_unpaid
+            };
+            money(net, "Balance")?
+        } else {
+            money(
+                transactions
+                    .iter()
+                    .map(|t| n(t, "amount") - n(t, "paid"))
+                    .sum(),
+                "Balance",
+            )?
+        };
         Ok(
             json!({"contact":c,"transactions":transactions,"balance":balance,"payments":query(db,"SELECT * FROM payments WHERE contact_id=? ORDER BY id DESC",&[v(&c,"id").clone()])?}),
         )
+    }
+    fn repair_details(&self, db: &Connection, repair_id: &str, _user: &Value) -> Result<Value> {
+        let mut repair = required_row(
+            db,
+            "SELECT r.*,c.name customer,c.phone,u.name technician FROM repairs r LEFT JOIN contacts c ON c.id=r.customer_id LEFT JOIN users u ON u.id=r.technician_id WHERE r.id=?",
+            &[json!(repair_id.parse::<i64>().unwrap_or(0))],
+            "Repair not found",
+        )?;
+        let parts = query(
+            db,
+            "SELECT rp.*, p.name product_name, p.sku FROM repair_parts rp JOIN products p ON p.id=rp.product_id WHERE rp.repair_id=? ORDER BY rp.id",
+            &[v(&repair, "id").clone()],
+        )?;
+        repair["parts"] = json!(parts);
+        Ok(repair)
     }
     fn create_repair(&self, db: &Connection, body: &Value, user: &Value) -> Result<Value> {
         let c = contact(db, id(body, "customer_id"), "customer")?
