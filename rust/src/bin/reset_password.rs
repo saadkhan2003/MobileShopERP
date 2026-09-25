@@ -54,6 +54,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
 
+    let pin_count: i64 = conn
+        .query_row("SELECT count(*) FROM recovery_keys", [], |r| r.get(0))
+        .unwrap_or(0);
+    if pin_count == 0 {
+        let pin_hash = hash_password("123456")?;
+        let _ = conn.execute(
+            "INSERT OR REPLACE INTO recovery_keys(id, recovery_key_hash, updated_at) VALUES(1, ?1, CURRENT_TIMESTAMP)",
+            [&pin_hash],
+        );
+        println!("INFO: Master Recovery PIN initialized to '123456'");
+    }
+
     println!("SUCCESS: Password for '{}' has been reset to '{}'", username, password);
     Ok(())
 }

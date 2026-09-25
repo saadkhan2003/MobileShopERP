@@ -1421,9 +1421,9 @@ function App() {
     return (
       <div className="relative flex min-h-screen w-full flex-col justify-center items-center bg-white dark:bg-white p-4 text-zinc-900 selection:bg-zinc-200">
         {/* Main Microsoft Authentication Card */}
-        <div className="w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-8 sm:p-11 shadow-[0_4px_16px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.06)] text-left">
+        <div className="w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-8 sm:px-10 sm:py-9 shadow-[0_4px_16px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.06)] text-left">
           {/* Organization Logo & Name */}
-          <div className="flex items-center gap-2.5 mb-4">
+          <div className="flex items-center gap-2.5 mb-3.5">
             <ShopLogo settings={settings} className="size-8 rounded-xs shadow-xs ring-1 ring-zinc-200 shrink-0" />
             <span className="text-base font-semibold text-zinc-900 tracking-tight">{settings.shop_name}</span>
           </div>
@@ -1431,13 +1431,13 @@ function App() {
           <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight mb-1">
             {status === "setup" ? "Set up your shop" : "Sign in"}
           </h1>
-          <p className="text-sm text-zinc-600 mb-6">
+          <p className="text-sm text-zinc-600 mb-5">
             {status === "setup"
               ? "Create the local owner account"
               : "Sign in to your desktop shop"}
           </p>
 
-          <form onSubmit={submitAuth} className="space-y-4">
+          <form onSubmit={submitAuth} className="space-y-3.5">
             {status === "setup" && (
               <div className="space-y-1">
                 <Label htmlFor="owner-name" className="text-sm font-normal text-zinc-800">
@@ -1508,7 +1508,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => setForgotModalOpen(true)}
-                  className="text-sm text-emerald-700 hover:text-emerald-800 hover:underline font-normal cursor-pointer"
+                  className="text-[13px] text-[#0067b8] hover:text-[#005da6] hover:underline font-normal cursor-pointer text-left"
                 >
                   Can&apos;t access your account?
                 </button>
@@ -1516,12 +1516,12 @@ function App() {
             )}
 
             {error && (
-              <div role="alert" className="text-sm text-[#e81123] font-normal leading-tight pt-1">
+              <div role="alert" className="text-xs text-[#e81123] font-normal leading-tight pt-0.5">
                 {error}
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-6">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <Button
                 disabled={busy}
                 type="submit"
@@ -1536,7 +1536,7 @@ function App() {
               </Button>
             </div>
           </form>
-          <div className="mt-5 pt-3.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
+          <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
             <div className="flex items-center gap-2">
               <img
                 src="/stack-and-scale-icon.png"
@@ -1570,10 +1570,10 @@ function App() {
               setRecoveryError("");
               setRecoverySuccess("");
             }}
-            className="mt-4 w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white p-3 shadow-[0_1px_4px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-50 transition-colors text-left cursor-pointer"
+            className="mt-4 w-full max-w-[440px] rounded-xs border border-zinc-200 bg-white dark:bg-white py-2.5 px-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex items-center gap-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-50 transition-colors text-left cursor-pointer"
           >
-            <KeyRound className="size-6 text-zinc-600 ml-1 shrink-0" />
-            <span className="text-[14px] text-zinc-900 font-normal">Sign-in options</span>
+            <KeyRound className="size-5 text-zinc-600 ml-0.5 shrink-0" />
+            <span className="text-[13.5px] text-zinc-900 font-normal">Sign-in options</span>
           </button>
         )}
 
