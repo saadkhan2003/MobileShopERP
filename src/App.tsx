@@ -952,25 +952,17 @@ function VendorInfoModal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="w-full max-w-lg rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
-        <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <div>
-            <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack &amp; Scale</h3>
-            <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-              Sovereign Software &amp; Enterprise Systems
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xs p-1 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 cursor-pointer transition-colors"
-            aria-label="Close"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
+      <div className="relative w-full max-w-lg rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3.5 right-3.5 rounded-xs p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 cursor-pointer transition-colors z-10"
+          aria-label="Close"
+        >
+          <X className="size-4" />
+        </button>
 
-        <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed max-h-[75vh] overflow-y-auto pr-1">
+        <div className="space-y-3.5 text-xs text-zinc-600 leading-relaxed max-h-[75vh] overflow-y-auto pr-1 pt-1">
           <div className="rounded-xs bg-zinc-50/80 border border-zinc-200 p-6 flex flex-col items-center justify-center text-center gap-3">
             <img
               src={stackAndScaleLogo}
