@@ -1,30 +1,28 @@
-# Mobile Shop ERP 0.4.0
-
 > **Critical Update**: This release resolves 10 confirmed QA defects across core ERP accounting, timezone display, repair parts tracking, IMEI duplicate handling, and cash session reconciliation. All desktop installations are required to upgrade to ensure accurate financial ledgers and document timestamps.
-
+n
 ---
 
 ### What's Changed in v0.4.0
 
 #### 1. Core Financial & Ledger Reconciliation
-- **[BUG-10] Used Phone Seller Ledger Balance** ([#10](https://github.com/saadkhan2003/MobileShopERP/issues/10)): Fixed contact ledger balance math so unpaid balances originating from used-phone purchases (`agreed_price - paid`) are properly reflected in the contact ledger balance and transaction list.
-- **[BUG-03] Sale Breakdown & Discount Display** ([#3](https://github.com/saadkhan2003/MobileShopERP/issues/3)): On-screen sale details now present a complete financial breakdown (Subtotal, Discount highlighted, Trade-in value, Total, Paid, and Remaining Balance) consistent with generated PDF invoices.
-- **[BUG-07] Cash Register Closing Report** ([#7](https://github.com/saadkhan2003/MobileShopERP/issues/7)): Resolved "Cash session not found" lookup errors by preventing cross-section row leakage and synchronizing canonical session selection.
+- **[[BUG-10] Used Phone Seller Ledger Balance (#10)](https://github.com/saadkhan2003/MobileShopERP/issues/10)**: Fixed contact ledger balance math so unpaid balances originating from used-phone purchases (`agreed_price - paid`) are properly reflected in the contact ledger balance and transaction list.
+- **[[BUG-03] Sale Breakdown & Discount Display (#3)](https://github.com/saadkhan2003/MobileShopERP/issues/3)**: On-screen sale details now present a complete financial breakdown (Subtotal, Discount highlighted, Trade-in value, Total, Paid, and Remaining Balance) consistent with generated PDF invoices.
+- **[[BUG-07] Cash Register Closing Report (#7)](https://github.com/saadkhan2003/MobileShopERP/issues/7)**: Resolved "Cash session not found" lookup errors by preventing cross-section row leakage and synchronizing canonical session selection.
 
 #### 2. Repair Workshop & Inventory Tracking
-- **[BUG-04] Consumed Spare Parts Tracking** ([#4](https://github.com/saadkhan2003/MobileShopERP/issues/4)): Implemented backend repair details endpoint (`GET /api/repairs/{id}`) to return consumed spare parts (`repair_parts`), displaying used components on-screen and rendering them in the Job Card PDF.
-- **[BUG-05] Repair Update Prefilled Fields** ([#5](https://github.com/saadkhan2003/MobileShopERP/issues/5)): Opening an existing repair now pre-populates all saved fields (status, labor charge, technician, expected date). Spare part consumption form is decoupled to prevent form state collisions.
+- **[[BUG-04] Consumed Spare Parts Tracking (#4)](https://github.com/saadkhan2003/MobileShopERP/issues/4)**: Implemented backend repair details endpoint (`GET /api/repairs/{id}`) to return consumed spare parts (`repair_parts`), displaying used components on-screen and rendering them in the Job Card PDF.
+- **[[BUG-05] Repair Update Prefilled Fields (#5)](https://github.com/saadkhan2003/MobileShopERP/issues/5)**: Opening an existing repair now pre-populates all saved fields (status, labor charge, technician, expected date). Spare part consumption form is decoupled to prevent form state collisions.
 
 #### 3. Global Timezone & Date Formatting
-- **[BUG-06] Accurate Local Timezone Display** ([#6](https://github.com/saadkhan2003/MobileShopERP/issues/6)): Implemented localized timezone formatting (`formatDateTime`) across all UI grids, cash register sessions, IMEI history, audit logs, and PDF exports, resolving the ~5-hour UTC display offset and matching local shop time (PKT / UTC+05:00).
+- **[[BUG-06] Accurate Local Timezone Display (#6)](https://github.com/saadkhan2003/MobileShopERP/issues/6)**: Implemented localized timezone formatting (`formatDateTime`) across all UI grids, cash register sessions, IMEI history, audit logs, and PDF exports, resolving the ~5-hour UTC display offset and matching local shop time (PKT / UTC+05:00).
 
 #### 4. Inventory & IMEI Protection
-- **[BUG-01] Duplicate IMEI Validation & Error Visibility** ([#1](https://github.com/saadkhan2003/MobileShopERP/issues/1)): Added pre-submit line-item duplicate detection, field-level error alerts, and clear structured backend error messages (`A phone with this IMEI already exists`).
-- **[BUG-02] Product Edit Form Prefilled** ([#2](https://github.com/saadkhan2003/MobileShopERP/issues/2)): Edit forms for existing products now reliably prefill saved name, retail price, cost, minimum price, and reorder levels.
+- **[[BUG-01] Duplicate IMEI Validation & Error Visibility (#1)](https://github.com/saadkhan2003/MobileShopERP/issues/1)**: Added pre-submit line-item duplicate detection, field-level error alerts, and clear structured backend error messages (`A phone with this IMEI already exists`).
+- **[[BUG-02] Product Edit Form Prefilled (#2)](https://github.com/saadkhan2003/MobileShopERP/issues/2)**: Edit forms for existing products now reliably prefill saved name, retail price, cost, minimum price, and reorder levels.
 
 #### 5. Management & User Experience
-- **[BUG-08] Human-Friendly IMEI History** ([#8](https://github.com/saadkhan2003/MobileShopERP/issues/8)): Replaced raw JSON dumps with structured, professional cards and tables for Handset Specifications, Sale & Customer records, Warranty Claims, Repair jobs, and Stock Movements.
-- **[BUG-09] Human-Readable Audit Trail** ([#9](https://github.com/saadkhan2003/MobileShopERP/issues/9)): Converted raw serialized audit JSON payloads into readable business action summaries (e.g., "Repair status changed to Delivered", "Payment recorded: Rs 2,000", "Updated shop branding").
+- **[[BUG-08] Human-Friendly IMEI History (#8)](https://github.com/saadkhan2003/MobileShopERP/issues/8)**: Replaced raw JSON dumps with structured, professional cards and tables for Handset Specifications, Sale & Customer records, Warranty Claims, Repair jobs, and Stock Movements.
+- **[[BUG-09] Human-Readable Audit Trail (#9)](https://github.com/saadkhan2003/MobileShopERP/issues/9)**: Converted raw serialized audit JSON payloads into readable business action summaries (e.g., "Repair status changed to Delivered", "Payment recorded: Rs 2,000", "Updated shop branding").
 
 ---
 
