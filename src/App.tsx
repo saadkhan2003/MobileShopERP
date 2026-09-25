@@ -23,6 +23,7 @@ import {
   HardDrive,
   HelpCircle,
   History,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   PackagePlus,
@@ -952,6 +953,55 @@ function App() {
     () => localStorage.getItem("shop-sidebar-collapsed") === "true",
   );
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordBusy, setPasswordBusy] = useState(false);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess("");
+    if (!passwordForm.current_password) {
+      setPasswordError("Please enter your current password.");
+      return;
+    }
+    if (passwordForm.new_password.length < 8) {
+      setPasswordError("New password must be at least 8 characters long.");
+      return;
+    }
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+    setPasswordBusy(true);
+    try {
+      await request("POST", "change-password", {
+        current_password: passwordForm.current_password,
+        new_password: passwordForm.new_password,
+      });
+      setPasswordSuccess("Password updated successfully!");
+      setPasswordForm({ current_password: "", new_password: "", confirm_password: "" });
+      setTimeout(() => {
+        setPasswordModalOpen(false);
+        setPasswordSuccess("");
+      }, 1500);
+    } catch (err: unknown) {
+      setPasswordError(
+        typeof err === "string"
+          ? err
+          : (err as Error)?.message || "Failed to update password",
+      );
+    } finally {
+      setPasswordBusy(false);
+    }
+  };
   const toggleSidebar = () =>
     setSidebarCollapsed((collapsed) => {
       localStorage.setItem("shop-sidebar-collapsed", String(!collapsed));
@@ -1239,51 +1289,57 @@ function App() {
       <aside
         data-testid="shop-sidebar"
         data-collapsed={sidebarCollapsed}
-        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r bg-sidebar text-sidebar-foreground ${sidebarCollapsed ? "w-16" : "w-64"}`}
+        className={`shop-sidebar flex h-full min-h-0 shrink-0 flex-col overflow-hidden border-r border-border/60 bg-sidebar/95 backdrop-blur-md text-sidebar-foreground transition-all duration-200 ${sidebarCollapsed ? "w-16" : "w-64"}`}
       >
-        <div className={`flex h-14 shrink-0 items-center gap-3 border-b border-border/30 ${sidebarCollapsed ? "px-4" : "px-3"}`}>
-          <ShopLogo settings={settings} />
+        <div className={`flex h-14 shrink-0 items-center gap-3 border-b border-border/40 ${sidebarCollapsed ? "px-3.5 justify-center" : "px-4"}`}>
+          <ShopLogo settings={settings} className="size-8.5 rounded-xl shadow-xs ring-1 ring-emerald-500/30" />
           <div className={`min-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 ${sidebarCollapsed ? "max-w-0 opacity-0" : "max-w-full opacity-100"}`} aria-hidden={sidebarCollapsed}>
-            <div className="text-sm font-bold leading-tight tracking-tight">{settings.shop_name}</div>
-            <div className="text-[11px] text-muted-foreground">{settings.tagline}</div>
+            <div className="text-sm font-bold tracking-tight text-foreground truncate">{settings.shop_name}</div>
+            <div className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 truncate flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              <span>{settings.tagline || "Enterprise ERP"}</span>
+            </div>
           </div>
         </div>
         <nav
           aria-label="Shop modules"
-          className={`flex-1 space-y-1 overflow-y-auto overflow-x-hidden py-2 ${sidebarCollapsed ? "px-1.5" : "px-2"}`}
+          className={`flex-1 space-y-1.5 overflow-y-auto overflow-x-hidden py-3 ${sidebarCollapsed ? "px-2" : "px-2.5"}`}
         >
           {menuGroups.map((group) => {
             const items = group.items.filter((key) => allowed(modules[key]));
             if (!items.length) return null;
             const open = sidebarCollapsed || openGroups.includes(group.title);
             return (
-              <div key={group.title} className={`menu-group py-1 ${sidebarCollapsed ? "border-b border-border/40 last:border-b-0" : ""}`}>
-                {!sidebarCollapsed && <button
-                  type="button"
-                  aria-expanded={open}
-                  aria-controls={`menu-${group.title.replaceAll(" ", "-")}`}
-                  onClick={() =>
-                    setOpenGroups((current) =>
-                      open
-                        ? current.filter((name) => name !== group.title)
-                        : [...current, group.title],
-                    )
-                  }
-                  className="flex w-full items-center justify-between rounded-md px-2.5 py-1 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  <span>{group.title}</span>
-                  <ChevronDown
-                    className={`size-3.5 transition-transform duration-200 ${open ? "" : "-rotate-90"}`}
-                  />
-                </button>}
+              <div key={group.title} className={`menu-group py-0.5 ${sidebarCollapsed ? "border-b border-border/40 pb-1.5 mb-1.5 last:border-b-0" : ""}`}>
+                {!sidebarCollapsed && (
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={`menu-${group.title.replaceAll(" ", "-")}`}
+                    onClick={() =>
+                      setOpenGroups((current) =>
+                        open
+                          ? current.filter((name) => name !== group.title)
+                          : [...current, group.title],
+                      )
+                    }
+                    className="group flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground select-none cursor-pointer"
+                  >
+                    <span>{group.title}</span>
+                    <ChevronDown
+                      className={`size-3 text-muted-foreground/40 transition-transform duration-200 group-hover:text-foreground ${open ? "" : "-rotate-90"}`}
+                    />
+                  </button>
+                )}
                 <div
                   id={`menu-${group.title.replaceAll(" ", "-")}`}
                   aria-hidden={!open}
                   className={`menu-group-content ${open ? "is-open" : ""}`}
                 >
-                  <div className="min-h-0 overflow-hidden pb-1">
+                  <div className="min-h-0 overflow-hidden space-y-0.5 pt-0.5">
                     {items.map((key) => {
                       const x = modules[key];
+                      const active = section === key;
                       return (
                         <button
                           key={key}
@@ -1291,12 +1347,30 @@ function App() {
                           tabIndex={open ? 0 : -1}
                           title={sidebarCollapsed ? x.title : undefined}
                           aria-label={sidebarCollapsed ? x.title : undefined}
-                          aria-current={section === key ? "page" : undefined}
+                          aria-current={active ? "page" : undefined}
                           onClick={() => navigate(key)}
-                          className={`my-0.5 flex h-9 w-full items-center gap-3 rounded-md text-left text-xs transition-colors ${sidebarCollapsed ? "justify-center px-0" : "px-2.5"} ${section === key ? `bg-sidebar-accent font-semibold ${sidebarCollapsed ? "text-emerald-600" : "border-l-2 border-emerald-600 text-sidebar-accent-foreground"}` : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                          className={`group flex h-8.5 w-full items-center gap-2.5 rounded-lg text-left text-xs transition-all duration-150 cursor-pointer ${
+                            sidebarCollapsed ? "justify-center px-0" : "px-2.5"
+                          } ${
+                            active
+                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold ring-1 ring-emerald-500/25 shadow-2xs"
+                              : "text-muted-foreground font-medium hover:bg-muted/60 hover:text-foreground"
+                          }`}
                         >
-                          <span className={`shrink-0 [&>svg]:size-4 ${section === key ? "text-emerald-600" : ""}`} aria-hidden="true">{x.icon}</span>
-                          <span className={sidebarCollapsed ? "sr-only" : "truncate"}>{x.title}</span>
+                          <span
+                            className={`shrink-0 transition-colors [&>svg]:size-4 ${
+                              active ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground/70 group-hover:text-foreground"
+                            }`}
+                            aria-hidden="true"
+                          >
+                            {x.icon}
+                          </span>
+                          <span className={sidebarCollapsed ? "sr-only" : "truncate"}>
+                            {x.title}
+                          </span>
+                          {!sidebarCollapsed && active && (
+                            <span className="ml-auto size-1.5 rounded-full bg-emerald-500" />
+                          )}
                         </button>
                       );
                     })}
@@ -1312,7 +1386,7 @@ function App() {
             onClick={toggleSidebar}
             title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`w-full gap-3 text-muted-foreground ${sidebarCollapsed ? "justify-center px-0" : "justify-start px-2.5"}`}
+            className={`w-full gap-2.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-lg h-8 text-xs ${sidebarCollapsed ? "justify-center px-0" : "justify-start px-2.5"}`}
           >
             {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
             <span className={sidebarCollapsed ? "sr-only" : "text-xs"}>{sidebarCollapsed ? "Expand" : "Collapse"}</span>
@@ -1348,9 +1422,10 @@ function App() {
               <HelpCircle size={14} className="text-primary" />
               <span>Help & Docs</span>
             </Button>
-            <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Offline ready</span>
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3 py-1 text-xs text-muted-foreground shadow-2xs font-medium">
+              <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
+              <span className="text-foreground font-semibold">Main Store</span>
+              <span className="text-[10px] text-muted-foreground font-normal">| Live Terminal</span>
             </div>
             {user && (
               <div className="relative pl-1">
@@ -1393,6 +1468,24 @@ function App() {
                       </div>
 
                       <div className="py-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            setPasswordError("");
+                            setPasswordSuccess("");
+                            setPasswordForm({
+                              current_password: "",
+                              new_password: "",
+                              confirm_password: "",
+                            });
+                            setPasswordModalOpen(true);
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-foreground hover:bg-muted transition-colors text-left cursor-pointer"
+                        >
+                          <KeyRound size={14} className="text-muted-foreground" />
+                          <span>Change Password</span>
+                        </button>
                         {user.role === "owner" && (
                           <button
                             type="button"
@@ -1426,7 +1519,7 @@ function App() {
                           type="button"
                           onClick={() => {
                             setUserMenuOpen(false);
-                            logout();
+                            setLogoutModalOpen(true);
                           }}
                           className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors text-left cursor-pointer"
                         >
@@ -1441,6 +1534,144 @@ function App() {
             )}
           </div>
         </header>
+
+        {logoutModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in-0">
+            <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                  <LogOut size={20} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground text-base">Confirm Sign Out</h3>
+                  <p className="text-xs text-muted-foreground">Session Termination</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Are you sure you want to sign out of <strong>{settings.shop_name}</strong>? Any unsaved edits will be discarded.
+              </p>
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setLogoutModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    setLogoutModalOpen(false);
+                    logout();
+                  }}
+                >
+                  Confirm Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {passwordModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in-0">
+            <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2 text-foreground font-semibold">
+                  <KeyRound size={18} className="text-primary" />
+                  <span>Change Password</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPasswordModalOpen(false)}
+                  className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground text-xs cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                {passwordError && (
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
+                    {passwordError}
+                  </div>
+                )}
+                {passwordSuccess && (
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                    {passwordSuccess}
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label htmlFor="current-pwd" className="text-xs font-medium text-foreground">
+                    Current Password
+                  </label>
+                  <Input
+                    id="current-pwd"
+                    type="password"
+                    value={passwordForm.current_password}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, current_password: e.target.value })
+                    }
+                    placeholder="Enter current password"
+                    required
+                    disabled={passwordBusy}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="new-pwd" className="text-xs font-medium text-foreground">
+                    New Password
+                  </label>
+                  <Input
+                    id="new-pwd"
+                    type="password"
+                    value={passwordForm.new_password}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, new_password: e.target.value })
+                    }
+                    placeholder="Minimum 8 characters"
+                    required
+                    disabled={passwordBusy}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="confirm-pwd" className="text-xs font-medium text-foreground">
+                    Confirm New Password
+                  </label>
+                  <Input
+                    id="confirm-pwd"
+                    type="password"
+                    value={passwordForm.confirm_password}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, confirm_password: e.target.value })
+                    }
+                    placeholder="Re-enter new password"
+                    required
+                    disabled={passwordBusy}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setPasswordModalOpen(false)}
+                    disabled={passwordBusy}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={passwordBusy}>
+                    {passwordBusy ? "Updating..." : "Update Password"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
         <UpdateCenter />
         <div key={section} className="page-enter mx-auto max-w-7xl p-8">
           <PageHeader

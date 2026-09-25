@@ -42,11 +42,11 @@ export function ShopLogo({
   className?: string;
 }) {
   return (
-    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-emerald-600 text-white shadow-sm ${className}`}>
+    <div className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-900 text-white shadow-sm ring-1 ring-emerald-500/20 ${className}`}>
       {settings.logo_data ? (
         <img src={settings.logo_data} alt="Shop logo" className="size-full object-contain bg-white" />
       ) : (
-        <Smartphone className="size-1/2" aria-hidden="true" />
+        <img src="/logo.png" alt={settings.shop_name || "Mobile Shop ERP"} className="size-full object-cover" />
       )}
     </div>
   );

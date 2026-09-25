@@ -1,5 +1,5 @@
 # Mobile Shop Desktop ERP — User Manual & Operations Guide
-**Version:** 0.4.1  
+**Version:** 0.4.2  
 **Edition:** Enterprise Desktop (Offline-First)  
 **Author:** Stack and Scale / Muhammad Saad Khan  
 **Last Updated:** September 2026  

@@ -528,6 +528,31 @@ impl Store {
             execute(db, "DELETE FROM sessions WHERE token=?", &[json!(token)])?;
             return Ok(json!({"ok":true}));
         }
+        if method == "POST" && path == "/api/change-password" {
+            let current_password = required(body, "current_password", "Current password")?;
+            let new_password = required(body, "new_password", "New password")?;
+            if new_password.len() < 8 {
+                return Err(err(400, "New password must have at least 8 characters"));
+            }
+            if !verify_password(&current_password, &s(&user, "password_hash")) {
+                return Err(err(400, "Current password is incorrect"));
+            }
+            let new_hash = hash_password(&new_password)?;
+            execute(
+                db,
+                "UPDATE users SET password_hash=? WHERE id=?",
+                &[json!(new_hash), v(&user, "id").clone()],
+            )?;
+            audit(
+                db,
+                &user,
+                "change_password",
+                "user",
+                v(&user, "id").clone(),
+                json!({"username": s(&user, "username")}),
+            )?;
+            return Ok(json!({"ok": true}));
+        }
         self.route_auth(db, method, path, body, &user)
     }
     fn route_auth(
@@ -559,6 +584,7 @@ impl Store {
    ("POST",["branches"])=>{allow(user,"owner")?;let x=execute(db,"INSERT INTO branches(name,address,phone) VALUES(?,?,?)",&[json!(required(body,"name","Branch name")?),json!(s(body,"address")),json!(s(body,"phone"))])?;audit(db,user,"create","branch",json!(x),json!({}))?;Ok(json!({"id":x}))}
    ("GET",["users"])=>{allow(user,"manager")?;Ok(json!(query(db,"SELECT id,name,username,role,active FROM users ORDER BY id",&[])?))}
    ("POST",["users"])=>{allow(user,"owner")?;let role=required(body,"role","Role")?;if role_level(&role)==0{return Err(err(400,"Invalid role"))}let password=required(body,"password","Password")?;if password.len()<8{return Err(err(400,"Password must have at least 8 characters"))}let x=execute(db,"INSERT INTO users(name,username,password_hash,role) VALUES(?,?,?,?)",&[json!(required(body,"name","Name")?),json!(required(body,"username","Username")?),json!(hash_password(&password)?),json!(role)])?;audit(db,user,"create","user",json!(x),json!({}))?;Ok(json!({"id":x}))}
+   ("POST",["users",user_id,"password"])=>{allow(user,"owner")?;let target_id: i64=user_id.parse().map_err(|_|err(400,"Invalid user ID"))?;let password=required(body,"password","Password")?;if password.len()<8{return Err(err(400,"Password must have at least 8 characters"))}let x=execute(db,"UPDATE users SET password_hash=? WHERE id=?",&[json!(hash_password(&password)?),json!(target_id)])?;if x==0{return Err(err(404,"User not found"))}audit(db,user,"reset_password","user",json!(target_id),json!({}))?;Ok(json!({"ok":true}))}
    ("GET",["contacts"])=>Ok(json!(query(db,"SELECT * FROM contacts WHERE (? IS NULL OR kind=?) ORDER BY name",&[if s(body,"kind").is_empty(){Value::Null}else{v(body,"kind").clone()},if s(body,"kind").is_empty(){Value::Null}else{v(body,"kind").clone()}])?)),
    ("POST",["contacts"])=>{let kind=required(body,"kind","Contact type")?;if kind!="customer"&&kind!="supplier"{return Err(err(400,"Invalid contact type"))}let x=execute(db,"INSERT INTO contacts(kind,name,phone,address,notes) VALUES(?,?,?,?,?)",&[json!(kind),json!(required(body,"name","Name")?),json!(s(body,"phone")),json!(s(body,"address")),json!(s(body,"notes"))])?;audit(db,user,"create","contact",json!(x),json!({}))?;Ok(json!({"id":x}))}
    ("GET",["products"])=>Ok(json!(query(db,"SELECT p.*, (SELECT COUNT(*) FROM phones h WHERE h.product_id=p.id AND h.status='available') phone_quantity FROM products p WHERE active=1 ORDER BY p.id DESC",&[])?.into_iter().map(|p|if role_level(&s(user,"role"))>=4{p}else{strip(p,&["cost","min_price"])}).collect::<Vec<_>>())),

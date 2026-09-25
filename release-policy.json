@@ -1,6 +1,6 @@
 {
-  "version": "0.4.1",
+  "version": "0.4.2",
   "critical": false,
   "minimum_version": "0.4.0",
-  "notes": "Release 0.4.1: Adds integrated in-depth User Guide & Operations Help Center, relocated profile & sign-out header, responsive category navigation, and standalone password reset tool."
+  "notes": "Release 0.4.2: Enterprise brand assets & icons, executive sidebar redesign, sign-out safety confirmation modal, and terminal status indicators."
 }

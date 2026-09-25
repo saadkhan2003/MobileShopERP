@@ -814,37 +814,46 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
     <div className="space-y-6">
       {/* Header Search & Filter */}
       <div className="rounded-xl border bg-gradient-to-r from-blue-900/10 via-indigo-900/5 to-transparent p-6">
-        <div className="max-w-2xl space-y-3">
-          <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
-            <BookOpen size={16} /> In-App Help &amp; Operations Documentation
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl space-y-3 flex-1">
+            <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
+              <BookOpen size={16} /> In-App Help &amp; Operations Documentation
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              How can we help you today?
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Search comprehensive guides for every module, workflow, role, and shortcut in Mobile Shop Desktop ERP.
+            </p>
+            <div className="relative pt-1">
+              <Search
+                size={18}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search guides (e.g., barcode, cash register, job card, udhaar, IMEI, backup)..."
+                className="pl-10 h-11 bg-background text-sm shadow-sm"
+              />
+              {search && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 text-xs"
+                  onClick={() => setSearch("")}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            How can we help you today?
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Search comprehensive guides for every module, workflow, role, and shortcut in Mobile Shop Desktop ERP.
-          </p>
-          <div className="relative pt-1">
-            <Search
-              size={18}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+          <div className="hidden lg:flex shrink-0 items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="Mobile Shop ERP"
+              className="size-20 rounded-2xl shadow-xl ring-1 ring-border/60 object-cover"
             />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search guides (e.g., barcode, cash register, job card, udhaar, IMEI, backup)..."
-              className="pl-10 h-11 bg-background text-sm shadow-sm"
-            />
-            {search && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 text-xs"
-                onClick={() => setSearch("")}
-              >
-                Clear
-              </Button>
-            )}
           </div>
         </div>
       </div>

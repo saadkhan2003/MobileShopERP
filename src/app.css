@@ -31,6 +31,28 @@ body {
   overscroll-behavior: contain;
 }
 
+.shop-sidebar nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140, 150, 160, 0.25) transparent;
+}
+
+.shop-sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.shop-sidebar nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shop-sidebar nav::-webkit-scrollbar-thumb {
+  background: rgba(140, 150, 160, 0.25);
+  border-radius: 9999px;
+}
+
+.shop-sidebar nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 150, 160, 0.45);
+}
+
 @layer base {
   :root {
     --background: oklch(1 0 0);

@@ -1,6 +1,15 @@
-# Mobile Shop ERP
+<div align="center">
+  <img src="public/brand-banner.png" alt="Mobile Shop ERP Banner" width="100%" />
 
-A local desktop application for a mobile phone shop. The backend is Rust with SQLite. The interface is React and TypeScript inside Tauri 2. It does not run an HTTP server or require a browser or internet connection for shop operations.
+  # Mobile Shop ERP
+  **Next-Gen Local Desktop ERP for Retail Smartphone & Electronics Stores**
+
+  [![Release](https://img.shields.io/github/v/release/saadkhan2003/MobileShopERP?style=flat-square&color=059669)](https://github.com/saadkhan2003/MobileShopERP/releases)
+  [![Platform](https://img.shields.io/badge/platform-Linux%20|%20Windows%20|%20macOS-blue?style=flat-square)](https://github.com/saadkhan2003/MobileShopERP/releases)
+  [![License](https://img.shields.io/badge/license-Proprietary-slate?style=flat-square)](#)
+</div>
+
+A high-performance local desktop application for retail mobile phone and accessories businesses. The backend is Rust with embedded SQLite. The interface is React and TypeScript inside Tauri 2. It does not run an external HTTP server or require an internet connection for shop operations.
 
 The shared Button, Card, PageHeader, Table, Input, Label and Badge components and the base visual tokens were adapted from the owner's [PharmaCare](https://github.com/saadkhan2003/PharmaCare) repository. Navigation and shop workflows are built for this application.
 
