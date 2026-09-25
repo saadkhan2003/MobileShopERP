@@ -1009,9 +1009,36 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
               </div>
             </div>
 
-            <h4 className="font-semibold text-base text-foreground pt-1">3. Custom Integrations &amp; Enterprise Support</h4>
+            <h4 className="font-semibold text-base text-foreground pt-1">3. Services &amp; Delivery Models We Provide</h4>
+            <div className="grid gap-3 sm:grid-cols-2 text-xs">
+              <div className="rounded-lg border p-3.5 bg-card space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <strong className="text-foreground font-semibold text-xs">Self-Hosted Deployments</strong>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-muted text-foreground">
+                    On-Premise
+                  </span>
+                </div>
+                <p className="text-muted-foreground leading-normal">
+                  Run 100% on your own local PC, bare-metal server, or private VPC. Operates fully air-gapped without internet, zero per-seat SaaS tax, and complete cryptographic database custody.
+                </p>
+              </div>
+
+              <div className="rounded-lg border p-3.5 bg-card space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <strong className="text-foreground font-semibold text-xs">SaaS &amp; Managed Cloud</strong>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    Cloud Apps
+                  </span>
+                </div>
+                <p className="text-muted-foreground leading-normal">
+                  Zero-maintenance cloud applications and managed databases. Multi-location inventory synchronization, live headquarters analytics, automated offsite backups, and guaranteed 99.999% SLA uptime.
+                </p>
+              </div>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">4. Custom Integrations &amp; Enterprise Support</h4>
             <p className="text-xs text-muted-foreground">
-              Need custom report formats, multi-branch network sync, or tailored enterprise workflows? Explore technical blueprints and enterprise partnerships at{" "}
+              Need custom POS report formats, multi-branch network sync, ESC/POS thermal printer setup, or specialized hardware? Explore technical blueprints and enterprise partnerships at{" "}
               <a
                 href="https://stackandscale.org"
                 target="_blank"

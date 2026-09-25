@@ -1023,11 +1023,47 @@ function VendorInfoModal({
             </div>
           </div>
 
-          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1 text-[11px]">
-            <div className="font-semibold text-zinc-900">Customizations &amp; Enterprise Support</div>
-            <p className="text-zinc-500">
-              Need multi-branch delta sync, custom invoice layouts, or specialized hardware (thermal printers, barcode scanners, cash drawers)? Enterprise partnerships available through Stack &amp; Scale.
-            </p>
+          {/* Services & Deployment Models */}
+          <div className="space-y-2 pt-1">
+            <span className="text-[11px] uppercase font-bold text-zinc-500 tracking-wider block">
+              Services &amp; Solutions We Provide
+            </span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="rounded-xs border border-zinc-200 bg-white p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <strong className="text-zinc-900 text-xs font-semibold">Self-Hosted Deployments</strong>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700">
+                    On-Premise
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-500 leading-normal">
+                  100% offline local hardware or private VPC. Air-gapped reliability, zero downtime during internet drops, full database custody, and zero per-seat SaaS fees.
+                </p>
+              </div>
+
+              <div className="rounded-xs border border-zinc-200 bg-white p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <strong className="text-zinc-900 text-xs font-semibold">SaaS &amp; Managed Cloud</strong>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Cloud Apps
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-500 leading-normal">
+                  Cloud apps &amp; managed infrastructure. Multi-branch real-time sync, centralized head-office analytics, automated remote backups, and 99.999% SLA uptime.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1.5 text-[11px]">
+              <strong className="text-zinc-900 font-semibold block">Custom Enterprise Engineering &amp; Hardware</strong>
+              <div className="grid grid-cols-2 gap-2 text-zinc-500 text-[10.5px]">
+                <div>• Hardware: Thermal printers, barcode scanners &amp; cash drawers</div>
+                <div>• Modules: Tailored ledgers, wholesale &amp; installment pipelines</div>
+                <div>• Multi-Store: Edge replication &amp; branch consolidation</div>
+                <div>• Delivery: White-glove legacy migration &amp; 24/7 technical support</div>
+              </div>
+            </div>
           </div>
         </div>
 
