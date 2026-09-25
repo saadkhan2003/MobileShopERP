@@ -15,14 +15,6 @@ fn hash_password(password: &str) -> Result<String, Box<dyn std::error::Error>> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
-    let username = args.get(1).map(|s| s.as_str()).unwrap_or("saadkhan2003");
-    let password = args.get(2).map(|s| s.as_str()).unwrap_or("admin1234");
-
-    if password.len() < 8 {
-        eprintln!("Error: Password must be at least 8 characters long.");
-        std::process::exit(1);
-    }
-
     let home = env::var("HOME")?;
     let db_path = PathBuf::from(home)
         .join(".local/share/com.mobileshop.erp/shop.db");
@@ -33,6 +25,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let conn = Connection::open(&db_path)?;
+
+    let default_user: String = conn
+        .query_row(
+            "SELECT username FROM users WHERE role = 'owner' AND active = 1 LIMIT 1",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap_or_else(|_| "admin".to_string());
+
+    let username = args.get(1).map(|s| s.as_str()).unwrap_or(&default_user);
+    let password = args.get(2).map(|s| s.as_str()).unwrap_or("admin1234");
+
+    if password.len() < 8 {
+        eprintln!("Error: Password must be at least 8 characters long.");
+        std::process::exit(1);
+    }
+
     let hash = hash_password(password)?;
 
     let updated = conn.execute(

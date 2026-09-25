@@ -941,6 +941,44 @@ export function HelpCenter({ onNavigate }: HelpCenterProps) {
           </div>
         ),
       },
+      {
+        id: "about-stack-and-scale",
+        category: "faq",
+        title: "About Stack & Scale (Engineering & Support)",
+        summary: "Architecture details, developer background, enterprise customization options, and contact.",
+        badge: "Partner",
+        content: (
+          <div className="space-y-4 text-sm leading-relaxed">
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-200 text-xs">
+              <strong>🚀 Engineered by Stack and Scale:</strong> Mobile Shop ERP is custom-built to deliver complete offline independence, high-speed desktop transactions, local data privacy, and resilient retail workflows.
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">1. Developer Information</h4>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <p>
+                <strong>Stack and Scale</strong> specializes in enterprise retail solutions, offline-first architectures, native desktop applications, and high-load business database software.
+              </p>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">2. Core Architectural Pillars</h4>
+            <div className="grid gap-3 sm:grid-cols-2 text-xs">
+              <div className="rounded-lg border p-3 bg-card">
+                <strong className="text-foreground block mb-1">Zero Latency Local Engine</strong>
+                <p className="text-muted-foreground">Embedded SQLite with scrypt cryptographic security, processing sales and lookups without network round-trips.</p>
+              </div>
+              <div className="rounded-lg border p-3 bg-card">
+                <strong className="text-foreground block mb-1">Hardware Reliability</strong>
+                <p className="text-muted-foreground">Native support for thermal receipt printers, USB barcode/IMEI scanners, and local PDF invoice generation.</p>
+              </div>
+            </div>
+
+            <h4 className="font-semibold text-base text-foreground pt-1">3. Custom Integrations &amp; Enterprise Support</h4>
+            <p className="text-xs text-muted-foreground">
+              For custom modules, multi-branch data synchronization, tailored invoice designs, or dedicated on-premise hardware setup, connect with Stack and Scale.
+            </p>
+          </div>
+        ),
+      },
     ],
     [onNavigate],
   );

@@ -937,6 +937,90 @@ function Grid({
     </Card>
   );
 }
+
+function VendorInfoModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="w-full max-w-lg rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-sm bg-black text-white flex items-center justify-center font-bold text-xs tracking-wider">
+              S&amp;S
+            </div>
+            <div>
+              <h3 className="font-semibold text-base text-zinc-900 leading-tight">Stack and Scale</h3>
+              <p className="text-[11px] text-zinc-500">Enterprise Systems &amp; Software Solutions</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xs p-1 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 cursor-pointer transition-colors"
+            aria-label="Close"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        <div className="space-y-3 text-xs text-zinc-600 leading-relaxed">
+          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-1.5">
+            <div className="font-semibold text-xs text-zinc-900 flex items-center gap-2">
+              <span className="size-2 rounded-full bg-emerald-500" />
+              <span>Made by Stack and Scale</span>
+            </div>
+            <p className="text-zinc-600 text-xs">
+              Mobile Shop ERP is engineered by <strong>Stack and Scale</strong> — delivering high-speed desktop architecture, offline-first data reliability, secure local SQLite management, and enterprise-grade retail POS workflows.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
+              <div className="font-semibold text-zinc-900 text-xs">System Architecture</div>
+              <p className="text-[11px] text-zinc-500">
+                Native Rust engine, scrypt cryptographic hashing, Tauri desktop bridge, and React interface.
+              </p>
+            </div>
+            <div className="rounded-xs border border-zinc-200 p-3 bg-white space-y-1">
+              <div className="font-semibold text-zinc-900 text-xs">Offline &amp; Private</div>
+              <p className="text-[11px] text-zinc-500">
+                Zero cloud reliance. Your customer ledgers, sales transactions, and profit margins remain strictly on your local PC.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3 space-y-1.5 text-[11px]">
+            <div className="font-semibold text-zinc-900">Customizations &amp; Enterprise Support</div>
+            <p className="text-zinc-500">
+              Need custom report formats, multi-branch network sync, hardware integrations (thermal printers, barcode scanners, cash drawers), or tailored features?
+            </p>
+            <div className="pt-1 border-t border-zinc-200 flex items-center justify-between text-zinc-700">
+              <span>Solution Partner:</span>
+              <span className="font-semibold text-zinc-900">Stack and Scale</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 flex justify-end gap-2 border-t border-zinc-200">
+          <Button
+            type="button"
+            onClick={onClose}
+            className="h-8 px-5 bg-black hover:bg-zinc-800 text-white dark:bg-black dark:hover:bg-zinc-800 dark:text-white font-normal text-xs rounded-xs shadow-xs cursor-pointer"
+          >
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [status, setStatus] = useState<"loading" | "setup" | "login" | "ready">(
     "loading",
@@ -966,6 +1050,7 @@ function App() {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [vendorModalOpen, setVendorModalOpen] = useState(false);
   const [copiedResetCmd, setCopiedResetCmd] = useState(false);
   const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -1312,6 +1397,16 @@ function App() {
               </Button>
             </div>
           </form>
+          <div className="mt-5 pt-3.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
+            <span>Engineered by <strong className="font-medium text-zinc-700">Stack and Scale</strong></span>
+            <button
+              type="button"
+              onClick={() => setVendorModalOpen(true)}
+              className="font-medium text-zinc-600 hover:text-zinc-900 hover:underline cursor-pointer"
+            >
+              About software
+            </button>
+          </div>
         </div>
 
         {/* Microsoft Signature "Sign-in options" card beneath */}
@@ -1326,17 +1421,30 @@ function App() {
           </button>
         )}
 
-        {/* Bottom Right Microsoft Footer */}
-        <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-end gap-6 text-[12px] text-zinc-500 pointer-events-auto">
-          <button
-            type="button"
-            onClick={() => setForgotModalOpen(true)}
-            className="hover:text-zinc-900 hover:underline cursor-pointer"
-          >
-            Can&apos;t access your account?
-          </button>
-          <span>Offline Local ERP</span>
-          <span>© 2026 {settings.shop_name}</span>
+        {/* Bottom Microsoft Footer */}
+        <footer className="fixed bottom-0 inset-x-0 py-3 px-6 flex items-center justify-between text-[12px] text-zinc-500 pointer-events-auto">
+          <div className="flex items-center gap-2">
+            <span>Made by <strong className="font-medium text-zinc-800">Stack and Scale</strong></span>
+            <span className="text-zinc-300">•</span>
+            <button
+              type="button"
+              onClick={() => setVendorModalOpen(true)}
+              className="hover:text-zinc-900 hover:underline cursor-pointer text-zinc-600"
+            >
+              About Stack &amp; Scale
+            </button>
+          </div>
+          <div className="flex items-center gap-6">
+            <button
+              type="button"
+              onClick={() => setForgotModalOpen(true)}
+              className="hover:text-zinc-900 hover:underline cursor-pointer"
+            >
+              Can&apos;t access your account?
+            </button>
+            <span>Offline Local ERP</span>
+            <span>© 2026 {settings.shop_name}</span>
+          </div>
         </footer>
 
         {forgotModalOpen && (
@@ -1394,14 +1502,17 @@ function App() {
                       </button>
                     </div>
                     <p className="text-[11px] text-zinc-500">
-                      Default credentials: username <strong className="text-zinc-800 font-medium">saadkhan2003</strong> / password <strong className="text-zinc-800 font-medium">admin1234</strong>.
+                      Default credentials: username <strong className="text-zinc-800 font-medium">admin</strong> / password <strong className="text-zinc-800 font-medium">admin1234</strong>.
                     </p>
                     <p className="text-[11px] text-zinc-500">
                       Or specify custom credentials:
                     </p>
                     <div className="rounded-xs bg-zinc-950 px-3 py-1.5 font-mono text-[11px] text-zinc-200 shadow-inner">
-                      cargo run --bin reset_password -- {form.username ? String(form.username) : "saadkhan2003"} &lt;new_password&gt;
+                      cargo run --bin reset_password -- {form.username ? String(form.username) : "admin"} &lt;new_password&gt;
                     </div>
+                    <p className="text-[11px] text-zinc-500 pt-1.5 border-t border-zinc-200">
+                      Need technical help? Contact <strong className="text-zinc-800 font-medium">Stack and Scale</strong> enterprise support.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1418,6 +1529,11 @@ function App() {
             </div>
           </div>
         )}
+
+        <VendorInfoModal
+          open={vendorModalOpen}
+          onClose={() => setVendorModalOpen(false)}
+        />
       </div>
     );
   const m = modules[section];
@@ -1579,6 +1695,36 @@ function App() {
             );
           })}
         </nav>
+        {!sidebarCollapsed ? (
+          <div className="mx-2 mb-2 p-2.5 rounded-lg border border-border/50 bg-muted/20 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[11px] text-foreground flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-emerald-500" />
+                Stack &amp; Scale
+              </span>
+              <button
+                type="button"
+                onClick={() => setVendorModalOpen(true)}
+                className="text-[10px] text-primary hover:underline cursor-pointer font-medium"
+              >
+                About
+              </button>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
+              Made by Stack and Scale • Retail ERP
+            </p>
+          </div>
+        ) : (
+          <div className="py-1 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVendorModalOpen(true)}
+              title="Made by Stack and Scale"
+              aria-label="Made by Stack and Scale"
+              className="size-2 rounded-full bg-emerald-500 hover:scale-125 transition-transform cursor-pointer"
+            />
+          </div>
+        )}
         <div className="border-t border-border/40 p-2">
           <Button
             variant="ghost"
@@ -2113,7 +2259,51 @@ function App() {
             />
           )}
           {section === "settings" && (
-            <><GlobalSettings settings={settings} save={saveSettings} /><UpdatePanel /></>
+            <>
+              <GlobalSettings settings={settings} save={saveSettings} />
+              <UpdatePanel />
+              <Card className="mt-5 border-border/60">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-emerald-500" />
+                        About Stack and Scale
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">Software Engineering &amp; Retail Systems Solutions</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      Official Provider
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 text-xs text-muted-foreground leading-relaxed">
+                  <p>
+                    This ERP platform was designed and engineered by <strong className="text-foreground">Stack and Scale</strong>. Built as an offline-first, native desktop application engineered with Rust, SQLite, and React to ensure zero latency, ironclad local data security, and uninterrupted retail store operations.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-3 pt-3 border-t text-[11px]">
+                    <div>
+                      <span className="font-semibold text-foreground block">Engineering Firm</span>
+                      <span>Stack and Scale</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-foreground block">Specialization</span>
+                      <span>Offline POS, Inventory Systems &amp; Hardware Integrations</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-foreground block">Support &amp; Custom Features</span>
+                      <button
+                        type="button"
+                        onClick={() => setVendorModalOpen(true)}
+                        className="text-primary hover:underline font-medium cursor-pointer"
+                      >
+                        View Provider Profile →
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
           )}
           {section === "history" && (
             <SearchPanel
@@ -2133,6 +2323,10 @@ function App() {
           )}
         </div>
       </main>
+      <VendorInfoModal
+        open={vendorModalOpen}
+        onClose={() => setVendorModalOpen(false)}
+      />
     </div>
   );
 }
