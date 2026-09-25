@@ -1340,71 +1340,77 @@ function App() {
         </footer>
 
         {forgotModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-            <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-xl space-y-4 text-card-foreground">
-              <div className="flex items-center justify-between border-b border-border/50 pb-3">
-                <div className="flex items-center gap-2 font-semibold text-base text-foreground">
-                  <KeyRound className="size-5 text-emerald-600 dark:text-emerald-400" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+            <div className="w-full max-w-md rounded-xs border border-zinc-200 bg-white dark:bg-white p-6 shadow-2xl space-y-4 text-zinc-900">
+              <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                <div className="flex items-center gap-2 font-semibold text-base text-zinc-900">
+                  <KeyRound className="size-5 text-zinc-900" />
                   <span>Password Recovery</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setForgotModalOpen(false)}
-                  className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+                  className="rounded-xs p-1 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 cursor-pointer transition-colors"
                   aria-label="Close"
                 >
                   <X className="size-4" />
                 </button>
               </div>
 
-              <div className="space-y-3.5 text-xs text-muted-foreground leading-relaxed">
-                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 p-3 text-emerald-900 dark:text-emerald-200">
-                  <p className="font-semibold text-xs text-emerald-950 dark:text-emerald-100 mb-1">
-                    Staff Accounts (Cashier, Technician, Salesman)
-                  </p>
-                  <p>
-                    Staff passwords can be reset instantly by the Store Owner under <strong>Settings → Staff & Roles</strong>.
+              <div className="space-y-3 text-xs leading-relaxed">
+                {/* Staff recovery box */}
+                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-1">
+                  <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
+                    <Users className="size-4 text-zinc-700 shrink-0" />
+                    <span>Staff Accounts (Cashier, Technician, Salesman)</span>
+                  </div>
+                  <p className="text-xs text-zinc-600 leading-relaxed pl-6">
+                    Staff passwords can be reset directly by the Store Owner under <strong className="text-zinc-800">Settings → Staff &amp; Roles</strong>.
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-muted/60 border border-border p-3.5 space-y-2">
-                  <p className="font-semibold text-xs text-foreground">
-                    Store Owner / Administrator Recovery
-                  </p>
-                  <p>
-                    Since Mobile Shop ERP is an offline local desktop system without cloud tracking, you can reset your owner credentials securely right from your terminal:
-                  </p>
-                  <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-950 px-3 py-2 font-mono text-[11px] text-zinc-100">
-                    <span className="truncate">npm run reset-password</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText("npm run reset-password");
-                        setCopiedResetCmd(true);
-                        setTimeout(() => setCopiedResetCmd(false), 2000);
-                      }}
-                      className="shrink-0 text-emerald-400 hover:text-emerald-300 font-sans text-xs underline cursor-pointer"
-                    >
-                      {copiedResetCmd ? "Copied!" : "Copy"}
-                    </button>
+                {/* Owner recovery box */}
+                <div className="rounded-xs bg-zinc-50 border border-zinc-200 p-3.5 space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
+                    <ShieldCheck className="size-4 text-zinc-700 shrink-0" />
+                    <span>Store Owner / Administrator Recovery</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Default reset credentials: username <strong>saadkhan2003</strong> / password <strong>admin1234</strong>.
+                  <p className="text-xs text-zinc-600 leading-relaxed pl-6">
+                    Since Mobile Shop ERP is an offline local desktop system without cloud tracking, you can reset your owner credentials securely right in your terminal:
                   </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    Or specify custom credentials:
-                  </p>
-                  <div className="rounded-md bg-zinc-950 px-3 py-1.5 font-mono text-[11px] text-zinc-300">
-                    cargo run --bin reset_password -- {form.username ? String(form.username) : "saadkhan2003"} &lt;new_password&gt;
+                  <div className="ml-6 space-y-2 pt-1">
+                    <div className="flex items-center justify-between gap-2 rounded-xs bg-zinc-950 px-3 py-2 font-mono text-[11px] text-zinc-100 shadow-inner">
+                      <span className="truncate">npm run reset-password</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText("npm run reset-password");
+                          setCopiedResetCmd(true);
+                          setTimeout(() => setCopiedResetCmd(false), 2000);
+                        }}
+                        className="shrink-0 text-emerald-400 hover:text-emerald-300 font-sans text-xs font-medium underline cursor-pointer"
+                      >
+                        {copiedResetCmd ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-zinc-500">
+                      Default credentials: username <strong className="text-zinc-800 font-medium">saadkhan2003</strong> / password <strong className="text-zinc-800 font-medium">admin1234</strong>.
+                    </p>
+                    <p className="text-[11px] text-zinc-500">
+                      Or specify custom credentials:
+                    </p>
+                    <div className="rounded-xs bg-zinc-950 px-3 py-1.5 font-mono text-[11px] text-zinc-200 shadow-inner">
+                      cargo run --bin reset_password -- {form.username ? String(form.username) : "saadkhan2003"} &lt;new_password&gt;
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2 border-t border-border/50">
+              <div className="pt-2 flex justify-end gap-2 border-t border-zinc-200">
                 <Button
-                  variant="outline"
-                  size="sm"
+                  type="button"
                   onClick={() => setForgotModalOpen(false)}
+                  className="h-8 px-5 bg-black hover:bg-zinc-800 text-white dark:bg-black dark:hover:bg-zinc-800 dark:text-white font-normal text-xs rounded-xs shadow-xs cursor-pointer"
                 >
                   Close
                 </Button>
