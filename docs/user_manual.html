@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Shop Desktop ERP — User Manual & Operations Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #172554;
+      --secondary: #0f766e;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #ffffff;
+      --bg-alt: #f8fafc;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --accent: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11pt;
+      line-height: 1.65;
+      color: var(--text);
+      background-color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .content {
+      padding: 50px 60px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #ffffff !important;
+        font-size: 10pt;
+      }
+      .container {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+      }
+      .content {
+        padding: 0 !important;
+      }
+      .page-break {
+        page-break-after: always;
+        break-after: page;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4;
+        margin: 18mm 15mm 18mm 15mm;
+      }
+      @page :left {
+        @bottom-left {
+          content: "Mobile Shop Desktop ERP — User Manual";
+          font-size: 8pt;
+          color: #94a3b8;
+        }
+        @bottom-right {
+          content: counter(page);
+          font-size: 8pt;
+          color: #94a3b8;
+        }
+      }
+      @page :right {
+        @bottom-left {
+          content: "Mobile Shop Desktop ERP — User Manual";
+          font-size: 8pt;
+          color: #94a3b8;
+        }
+        @bottom-right {
+          content: counter(page);
+          font-size: 8pt;
+          color: #94a3b8;
+        }
+      }
+    }
+
+    /* Cover Page */
+    .cover {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 90px 60px 80px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0) 70%);
+      border-radius: 50%;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(147, 197, 253, 0.3);
+      color: #93c5fd;
+      font-size: 9pt;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .cover h1 {
+      font-size: 28pt;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .cover h2 {
+      font-size: 14pt;
+      font-weight: 400;
+      color: #cbd5e1;
+      margin-bottom: 40px;
+    }
+
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 9pt;
+    }
+
+    .cover-meta-item strong {
+      display: block;
+      color: #94a3b8;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .cover-meta-item span {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    /* Headings */
+    h2.section-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3.subsection-title {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      color: #334155;
+    }
+
+    /* Table of Contents */
+    .toc {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin: 30px 0;
+    }
+
+    .toc h3 {
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 30px;
+    }
+
+    .toc-item {
+      font-size: 9.5pt;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 3px;
+    }
+
+    .toc-item a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .toc-item a:hover {
+      text-decoration: underline;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 18px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 9.5pt;
+    }
+
+    .callout-icon {
+      font-size: 14pt;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary-light);
+      color: #1e40af;
+    }
+
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid var(--success);
+      color: #166534;
+    }
+
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid var(--warning);
+      color: #92400e;
+    }
+
+    .callout-danger {
+      background: #fef2f2;
+      border-left: 4px solid var(--danger);
+      color: #991b1b;
+    }
+
+    /* Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 24px 0;
+      font-size: 9.5pt;
+    }
+
+    table.data-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+    }
+
+    table.data-table td {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      color: #334155;
+    }
+
+    table.data-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    /* Lists */
+    ol, ul {
+      margin-left: 22px;
+      margin-bottom: 16px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    /* Badges & Code */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9pt;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: #dbeafe; color: #1e40af; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+
+    /* Steps */
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      margin-left: 0;
+      margin-bottom: 20px;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 42px;
+      margin-bottom: 16px;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      background: #e0e7ff;
+      color: #4338ca;
+      font-weight: 700;
+      font-size: 9pt;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Formula Box */
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9pt;
+      color: #0f172a;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .footer-bar {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 8.5pt;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- COVER PAGE -->
+  <div class="cover">
+    <div class="cover-badge">Official Documentation · v0.4.0</div>
+    <h1>Mobile Shop Desktop ERP</h1>
+    <h2>Comprehensive User Manual & System Operations Guide</h2>
+    
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <strong>Software Edition</strong>
+        <span>Enterprise Desktop (Offline-First)</span>
+      </div>
+      <div class="cover-meta-item">
+        <strong>Technology Stack</strong>
+        <span>Tauri v2 · Rust · SQLite · React</span>
+      </div>
+      <div class="cover-meta-item">
+        <strong>Target Audience</strong>
+        <span>Shop Owners, Managers, Cashiers, Technicians</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <div class="toc-grid">
+        <div class="toc-item"><a href="#sec-1">1. System Overview & Architecture</a><span>01</span></div>
+        <div class="toc-item"><a href="#sec-2">2. User Roles & Access Control</a><span>02</span></div>
+        <div class="toc-item"><a href="#sec-3">3. First-Time Setup & Settings</a><span>03</span></div>
+        <div class="toc-item"><a href="#sec-4">4. Daily Cash Register Shifts</a><span>04</span></div>
+        <div class="toc-item"><a href="#sec-5">5. Inventory Management</a><span>05</span></div>
+        <div class="toc-item"><a href="#sec-6">6. Point of Sale & Billing</a><span>06</span></div>
+        <div class="toc-item"><a href="#sec-7">7. Customer & Supplier Ledgers</a><span>07</span></div>
+        <div class="toc-item"><a href="#sec-8">8. Repair & Service Center</a><span>08</span></div>
+        <div class="toc-item"><a href="#sec-9">9. Returns & IMEI Search</a><span>09</span></div>
+        <div class="toc-item"><a href="#sec-10">10. Expenses & Drawings</a><span>10</span></div>
+        <div class="toc-item"><a href="#sec-11">11. Business Reports</a><span>11</span></div>
+        <div class="toc-item"><a href="#sec-12">12. Backups, Restore & Updates</a><span>12</span></div>
+      </div>
+    </div>
+
+    <!-- 1. SYSTEM OVERVIEW -->
+    <h2 id="sec-1" class="section-title">1. System Overview & Architecture</h2>
+    <p>
+      <strong>Mobile Shop Desktop ERP</strong> is a purpose-built desktop business management platform engineered specifically for retail mobile phone outlets, wholesale dealers, and repair service centers.
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">💡</div>
+      <div>
+        <strong>Offline-First Architecture:</strong> The application does NOT depend on cloud connectivity. All transactions, IMEI searches, inventory updates, and repair tickets are processed instantaneously on your local computer via a lightning-fast SQLite database.
+      </div>
+    </div>
+
+    <p><strong>Key Highlights:</strong></p>
+    <ul>
+      <li><strong>Serialized Inventory:</strong> Strict IMEI intake with duplicate detection for box-packed new phones and pre-owned devices.</li>
+      <li><strong>Used Phone Compliance:</strong> Captures seller CNIC, phone number, and physical condition checks to protect your business legally.</li>
+      <li><strong>Integrated Service Center:</strong> Job cards with advance deposits, physical fault checklists, and automatic spare-part inventory deductions.</li>
+      <li><strong>Complete Double-Entry Ledgers (Khata):</strong> Tracks customer credit (udhaar), supplier balances, and running payment receipts.</li>
+      <li><strong>Cash Shift Discipline:</strong> Morning drawer float entry, mid-day cash in/out, and end-of-day discrepancy reporting.</li>
+    </ul>
+
+    <!-- 2. USER ROLES -->
+    <h2 id="sec-2" class="section-title">2. User Roles & Access Control</h2>
+    <p>
+      The system implements Role-Based Access Control (RBAC) to ensure security and prevent unauthorized adjustments:
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Cash Register</th>
+          <th>POS Sales</th>
+          <th>Repairs</th>
+          <th>Inventory</th>
+          <th>Reports</th>
+          <th>Settings & Backups</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Admin</strong></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+        </tr>
+        <tr>
+          <td><strong>Manager</strong></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-warning">View Only</span></td>
+        </tr>
+        <tr>
+          <td><strong>Cashier</strong></td>
+          <td><span class="badge badge-primary">Own Session</span></td>
+          <td><span class="badge badge-success">Full</span></td>
+          <td><span class="badge badge-primary">Receive Only</span></td>
+          <td><span class="badge badge-warning">View Only</span></td>
+          <td><span class="badge badge-warning">Shift Only</span></td>
+          <td><span class="badge">None</span></td>
+        </tr>
+        <tr>
+          <td><strong>Technician</strong></td>
+          <td><span class="badge">None</span></td>
+          <td><span class="badge">None</span></td>
+          <td><span class="badge badge-success">Full Workshop</span></td>
+          <td><span class="badge badge-primary">Parts Only</span></td>
+          <td><span class="badge">None</span></td>
+          <td><span class="badge">None</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 3. FIRST TIME SETUP -->
+    <h2 id="sec-3" class="section-title">3. First-Time Setup & Store Configuration</h2>
+    <ol class="step-list">
+      <li>
+        <strong>Log in as Administrator:</strong> Enter the initial admin PIN / password provided at installation.
+      </li>
+      <li>
+        <strong>Configure Store Details:</strong> Navigate to <code>Settings</code>. Enter your <strong>Store Name</strong>, <strong>Contact Phone Numbers</strong>, <strong>Shop Address / City</strong>, <strong>Currency Symbol</strong> (e.g., <code>Rs.</code> or <code>PKR</code>), and <strong>Receipt Footer Notes</strong>.
+      </li>
+      <li>
+        <strong>Add Branches (Optional):</strong> If operating across multiple outlets or warehouses, register each location under <code>Branches</code>.
+      </li>
+      <li>
+        <strong>Create Staff Logins:</strong> Go to <code>Staff & Roles</code>, create individual logins for your cashiers and technicians, and assign their permissions.
+      </li>
+    </ol>
+
+    <!-- 4. CASH REGISTER -->
+    <h2 id="sec-4" class="section-title">4. Daily Cash Register & Shift Operations</h2>
+    <p>The Cash Register module ensures strict cash accountability at the counter.</p>
+
+    <h3 class="subsection-title">4.1 Opening the Register</h3>
+    <ol class="step-list">
+      <li>Open <code>Cash Register</code> at the start of your shift.</li>
+      <li>Click <strong>Open Cash Session</strong>.</li>
+      <li>Count and enter the physical <strong>Opening Float</strong> (cash left in the drawer for change, e.g., <code>10,000</code>).</li>
+      <li>Click <strong>Start Session</strong>. The POS is now enabled for sales.</li>
+    </ol>
+
+    <h3 class="subsection-title">4.2 Recording Mid-Day Cash Movements</h3>
+    <ul>
+      <li><strong>Cash Out:</strong> Used when cash leaves the drawer for shop expenses (lunch, generator fuel, tea, couriers) or owner cash drawings.</li>
+      <li><strong>Cash In:</strong> Used when extra cash float is deposited into the cash drawer.</li>
+    </ul>
+
+    <h3 class="subsection-title">4.3 Closing the Register & Reconciliation</h3>
+    <div class="formula-box">
+      Expected Cash = Opening Float + Cash Sales + Cash In - Cash Out - Cash Refunds
+    </div>
+    <ol class="step-list">
+      <li>At shift end, click <strong>Close Session</strong>.</li>
+      <li>Count physical cash in the drawer and type into <strong>Physical Cash Counted</strong>.</li>
+      <li>The system automatically computes whether the register is <strong>Balanced</strong>, <strong>Over</strong>, or <strong>Short</strong>.</li>
+      <li>Confirm and print the shift summary.</li>
+    </ol>
+
+    <!-- 5. INVENTORY -->
+    <h2 id="sec-5" class="section-title">5. Inventory & Stock Management</h2>
+
+    <h3 class="subsection-title">5.1 Box-Packed (New) Mobile Phones</h3>
+    <p>Each new device requires scanning its 15-digit IMEI number. The system enforces unique IMEI protection so you can never accidentally enter the same phone twice.</p>
+    <ul>
+      <li>Required fields: <strong>Brand & Model</strong>, <strong>Color/Variant</strong>, <strong>IMEI 1 & 2</strong>, <strong>Cost Price</strong>, <strong>Retail Price</strong>, <strong>Warranty Period</strong>.</li>
+    </ul>
+
+    <h3 class="subsection-title">5.2 Used / Second-Hand Phone Purchases</h3>
+    <div class="callout callout-warning">
+      <div class="callout-icon">⚠️</div>
+      <div>
+        <strong>Legal Compliance Rule:</strong> Always verify and enter the seller's complete National ID (CNIC) and active phone number when buying used devices.
+      </div>
+    </div>
+    <ul>
+      <li>Record battery health %, physical grade (A/B/C), and included original accessories (box, charger, receipt).</li>
+      <li>If full payment is not made upfront, the unpaid balance is automatically posted to the <strong>Seller Khata Ledger</strong>.</li>
+    </ul>
+
+    <h3 class="subsection-title">5.3 Spare Parts & Accessories</h3>
+    <ul>
+      <li><strong>Spare Parts:</strong> Screens, batteries, charging ports, cameras. Set <em>Minimum Reorder Level</em> to receive low-stock alerts.</li>
+      <li><strong>General Accessories:</strong> Scan manufacturer barcodes on packaging. Rapid checkout via USB barcode scanner.</li>
+    </ul>
+
+    <!-- 6. POS BILLING -->
+    <h2 id="sec-6" class="section-title">6. Point of Sale (POS) & Billing</h2>
+    <ol class="step-list">
+      <li><strong>Scan or Search:</strong> Aim your barcode scanner at the product barcode or type the IMEI into the POS search bar.</li>
+      <li><strong>Customer:</strong> Leave as <em>Walk-in Customer</em> or select an existing customer from your directory.</li>
+      <li><strong>Discounts:</strong> Enter item-level discounts or invoice-level discounts. The screen clearly highlights the subtotal, discount deducted, and net payable.</li>
+      <li><strong>Payment Method:</strong> Select <strong>Cash</strong>, <strong>Card</strong>, <strong>Bank Transfer</strong>, or <strong>Customer Credit (Khata)</strong>.</li>
+      <li><strong>Print Invoice:</strong> Instant 80mm thermal receipt or full-page A4 invoice.</li>
+    </ol>
+
+    <!-- 7. LEDGERS -->
+    <h2 id="sec-7" class="section-title">7. Customer & Supplier Ledgers (Khata Accounts)</h2>
+    <p>Manage credit sales and supplier payouts without separate ledger notebooks:</p>
+    <ul>
+      <li><strong>Giving on Credit (Udhaar):</strong> Select customer at POS and choose <em>Customer Credit</em>. Invoice total is automatically debited to their account.</li>
+      <li><strong>Receiving Balance Payments:</strong> Go to <code>Khata / Customers</code>, select the client, click <strong>Receive Payment</strong>, input amount, and print a payment receipt. Physical cash is instantly added to your active cash register.</li>
+      <li><strong>Supplier Balances:</strong> View unpaid balances for used phone sellers or wholesale part distributors. Record payouts with one click.</li>
+    </ul>
+
+    <!-- 8. REPAIRS -->
+    <h2 id="sec-8" class="section-title">8. Mobile Repair & Service Center Workflow</h2>
+    <p>A complete 5-stage workshop lifecycle:</p>
+
+    <ol class="step-list">
+      <li>
+        <strong>Job Card Intake:</strong> Record customer contact, device model, passcode, problem description, physical condition checklist, estimated cost, and collect an <strong>Advance Deposit</strong>.
+      </li>
+      <li>
+        <strong>Print Job Card Receipt:</strong> Print a receipt with ticket barcode and terms. The client gets one copy, and the workshop copy is attached to the phone.
+      </li>
+      <li>
+        <strong>Technician Assignment:</strong> Move status from <em>Pending</em> to <em>In Progress</em> or <em>Waiting for Parts</em>.
+      </li>
+      <li>
+        <strong>Consume Spare Parts:</strong> Select the part used (e.g., <em>iPhone 13 OLED Screen</em>). The part is <strong>automatically deducted from stock</strong> and linked to the repair cost.
+      </li>
+      <li>
+        <strong>Final Settlement & Delivery:</strong> The system automatically deducts the advance deposit:
+        <div class="formula-box">Final Balance Due = Total Repair Cost - Advance Deposit Paid</div>
+        Collect final payment, close ticket, and print the warranty repair receipt.
+      </li>
+    </ol>
+
+    <!-- 9. RETURNS & IMEI SEARCH -->
+    <h2 id="sec-9" class="section-title">9. Returns & Full IMEI Lifecycle Search</h2>
+    <ul>
+      <li><strong>Customer Sales Returns:</strong> Scan receipt barcode, select return item, and choose refund mode (Cash, Exchange, or Store Credit).</li>
+      <li><strong>IMEI Lifecycle Tracker:</strong> Enter any 15-digit IMEI to inspect its complete timeline: when purchased, from which seller, cost price, which customer purchased it, warranty status, and all repair history.</li>
+    </ul>
+
+    <!-- 10. EXPENSES -->
+    <h2 id="sec-10" class="section-title">10. Expenses & Owner Drawings</h2>
+    <ul>
+      <li><strong>Shop Expenses:</strong> Categorized logs for rent, electricity, tea/food, staff salaries, and stationery. Deducted from net operational profit.</li>
+      <li><strong>Owner Drawings:</strong> Personal withdrawals by the store owner. Tracked cleanly in equity without distorting operating profit.</li>
+    </ul>
+
+    <!-- 11. REPORTS -->
+    <h2 id="sec-11" class="section-title">11. Business Reports & Analytics</h2>
+    <ul>
+      <li><strong>Daily Sales & Profit:</strong> Real-time gross margin, itemized net profit, and revenue trends.</li>
+      <li><strong>Inventory Valuation:</strong> Total capital invested across phones, spare parts, and accessories at current cost.</li>
+      <li><strong>Technician Performance:</strong> Number of jobs finished and revenue generated per technician.</li>
+      <li><strong>Low Stock Alerts:</strong> Fast-moving items requiring urgent reorder.</li>
+    </ul>
+
+    <!-- 12. BACKUPS & MAINTENANCE -->
+    <h2 id="sec-12" class="section-title">12. Database Backups, Restore & Maintenance</h2>
+    <div class="callout callout-danger">
+      <div class="callout-icon">💾</div>
+      <div>
+        <strong>Crucial Daily Rule:</strong> Create a backup to an external USB flash drive or cloud folder (Google Drive/Dropbox) every evening before shutting down your computer!
+      </div>
+    </div>
+
+    <h3 class="subsection-title">12.1 Creating a Backup</h3>
+    <ol class="step-list">
+      <li>Insert your USB drive.</li>
+      <li>Navigate to <code>Settings</code> > <code>Database Backup & Restore</code>.</li>
+      <li>Click <strong>Create Backup Now</strong> and select your USB drive folder.</li>
+      <li>A verified, timestamped backup file (<code>.db</code>) is saved in seconds.</li>
+    </ol>
+
+    <h3 class="subsection-title">12.2 Restoring Database</h3>
+    <p>To restore your data onto a new or formatted computer, click <strong>Restore Database</strong>, select your <code>.db</code> file, and confirm. All records are restored seamlessly.</p>
+
+    <div class="footer-bar">
+      <span>Mobile Shop Desktop ERP · User Manual v0.4.0</span>
+      <span>Published by Stack and Scale (stackandscale.org)</span>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
