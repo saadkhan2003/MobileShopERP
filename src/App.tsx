@@ -951,6 +951,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem("shop-sidebar-collapsed") === "true",
   );
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const toggleSidebar = () =>
     setSidebarCollapsed((collapsed) => {
       localStorage.setItem("shop-sidebar-collapsed", String(!collapsed));
@@ -1320,52 +1321,123 @@ function App() {
       </aside>
       <main className="shop-content-scroll h-full min-h-0 min-w-0 flex-1 overflow-y-auto">
         <header className="flex h-14 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon-sm" onClick={toggleSidebar} aria-label="Toggle sidebar" title="Toggle sidebar">
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
+              title="Toggle sidebar"
+              className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
               {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
             </Button>
             <span className="h-4 border-l" aria-hidden="true" />
-            <span className="text-sm text-muted-foreground">
-            Local desktop database
-            </span>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+              <HardDrive size={13} className="text-muted-foreground/70" />
+              <span>Local desktop database</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              className="h-8 gap-1.5 rounded-full border border-border/60 bg-muted/30 px-3 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
               onClick={() => setSection("help")}
             >
-              <HelpCircle size={15} />
+              <HelpCircle size={14} className="text-primary" />
               <span>Help & Docs</span>
             </Button>
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-              ● Offline ready
-            </span>
+            <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Offline ready</span>
+            </div>
             {user && (
-              <>
-                <span className="h-4 border-l" aria-hidden="true" />
-                <div className="flex items-center gap-2 pl-1">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              <div className="relative pl-1">
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 rounded-full border border-border/70 bg-card py-1 pl-1.5 pr-2.5 text-xs shadow-2xs hover:bg-accent hover:border-border transition-all cursor-pointer"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-2xs">
                     {user.name?.[0]?.toUpperCase() || "U"}
                   </div>
-                  <div className="hidden sm:block text-left text-xs leading-tight">
-                    <div className="font-medium text-foreground">{user.name}</div>
-                    <div className="capitalize text-[10px] text-muted-foreground">{user.role}</div>
+                  <div className="flex flex-col text-left leading-none">
+                    <span className="font-semibold text-foreground text-xs leading-none">
+                      {user.name}
+                    </span>
+                    <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground leading-none mt-0.5">
+                      {user.role}
+                    </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={logout}
-                    title="Sign out"
-                    aria-label="Sign out"
-                    className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <LogOut size={14} />
-                    <span className="hidden sm:inline">Sign out</span>
-                  </Button>
-                </div>
-              </>
+                  <ChevronDown
+                    size={12}
+                    className={`text-muted-foreground transition-transform duration-200 ${
+                      userMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-1.5 z-50 w-52 rounded-xl border border-border bg-card p-1.5 text-card-foreground shadow-lg backdrop-blur-md">
+                      <div className="px-2.5 py-2 border-b border-border/60">
+                        <p className="text-xs font-semibold text-foreground">{user.name}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Role: <span className="font-medium text-foreground capitalize">{user.role}</span>
+                        </p>
+                      </div>
+
+                      <div className="py-1">
+                        {user.role === "owner" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              setSection("settings");
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-foreground hover:bg-muted transition-colors text-left cursor-pointer"
+                          >
+                            <Settings2 size={14} className="text-muted-foreground" />
+                            <span>Global Settings</span>
+                          </button>
+                        )}
+                        {(user.role === "owner" || user.role === "manager") && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              setSection("users");
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-foreground hover:bg-muted transition-colors text-left cursor-pointer"
+                          >
+                            <Users size={14} className="text-muted-foreground" />
+                            <span>Staff Accounts</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="border-t border-border/60 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            logout();
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors text-left cursor-pointer"
+                        >
+                          <LogOut size={14} />
+                          <span>Sign out</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </header>
