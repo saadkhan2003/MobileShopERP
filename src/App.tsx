@@ -28,7 +28,6 @@ import {
   KeyRound,
   LayoutDashboard,
   Loader2,
-  Lock,
   LogOut,
   PackagePlus,
   PanelLeft,
