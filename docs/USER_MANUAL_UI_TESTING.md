@@ -1,8 +1,10 @@
 # Mobile Shop ERP
 ## User manual and end-to-end UI test guide
 
-**Edition:** Desktop v0.4.0  
-**Audience:** Shop owner, managers, cashiers, technicians, and UI test team  
+**Edition:** Desktop v0.4.3
+
+**Audience:** Shop owner, managers, cashiers, technicians, and UI test team
+
 **Scope:** The installed desktop application on Linux, Windows, or macOS. All test steps use visible controls. No terminal, database editor, API client, or SQL is required.
 
 This guide describes the screens present in the desktop application. Subscription plans and tenant licensing are planned for a later release and are not current tabs. A 30-day sign-in session is not a subscription. Test on a separate test computer or operating-system user account. Never use a live customer's business records for destructive return or restore tests.
@@ -10,7 +12,7 @@ This guide describes the screens present in the desktop application. Subscriptio
 # 1. First launch and navigation
 
 1. Open the installed **Mobile Shop ERP** application. On a new installation, create the local owner account using name, username, and a password of at least eight characters.
-2. Sign in. The **Dashboard** opens. The sidebar is organized into **Overview**, **Inventory**, **Sales & customers**, **Workshop**, **Finance**, and **Management**.
+2. Sign in. The **Dashboard** opens. The sidebar is organized into **Overview**, **Inventory**, **Sales & customers**, **Workshop**, **Finance**, **Management**, and **Help & Documentation**.
 3. Use the group chevrons to fold or expand groups. Use **Collapse sidebar** to switch to the icon rail; hover or use the accessible labels to identify icons. Expand it again to see the names.
 4. Use **Add new** on pages that support creation. Forms reveal more fields when a category or product is selected. Use **Refresh** to reload a page. Select a row to open its detail card and related actions.
 5. Searchable dropdowns filter as you type and should close after an item is selected, when you click outside, or when you press Escape. Date pickers should close when a complete date is chosen. Scroll the content area to reach long forms; the sidebar remains independently scrollable.
@@ -284,7 +286,17 @@ Before each test case, write down the starting counts and amounts shown in the U
 
 **Pass:** The listed actor, operation, and record type match the visible action. Cashier/technician must not see this page.
 
-# 10. UI-only regression checklist
+# 10. Help and documentation
+
+## User Guide & Documentation
+
+**Use:** Open the **Help & Documentation** sidebar group, then **User Guide & Documentation**. Browse the built-in guide, search for a feature, and use its links to open the related module. The installed help page is a quick reference; this PDF provides the full UI test procedure.
+
+**UI test H-01:** Search the help page for inventory, billing, repair, and backup. Open one matching module link from each topic, then return to the guide. Verify the guide remains readable with the sidebar expanded and collapsed.
+
+**Pass:** Search results match the query, each link opens the intended module, and there is no blank or broken help panel.
+
+# 11. UI-only regression checklist
 
 Run the following after every release. Mark each **Pass**, **Fail**, or **Not run** and attach a screenshot for failures. Do not substitute command-line or database checks for the on-screen result.
 
@@ -292,7 +304,7 @@ Run the following after every release. Mark each **Pass**, **Fail**, or **Not ru
 | --- | --- | --- |
 | R-01 | Sign in, sign out, and relaunch. | Correct account, no stale signed-in session after sign-out. |
 | R-02 | Collapse sidebar, navigate by icon, expand, relaunch. | Selected page and saved collapse preference work. |
-| R-03 | Open each sidebar group and all 26 module pages as owner. | Correct heading and no error or blank crash screen. |
+| R-03 | Open each sidebar group and all 27 module pages as owner. | Correct heading and no error or blank crash screen. |
 | R-04 | Search a dropdown, select a value, click outside, press Escape. | List closes; chosen value stays selected. |
 | R-05 | Choose dates in Reports, Repairs, and Installments. | Date picker closes and date remains correct. |
 | R-06 | Scroll long Reports and form pages to the bottom. | Content remains readable; no huge empty tail or overlapping navigation. |
@@ -308,7 +320,7 @@ Run the following after every release. Mark each **Pass**, **Fail**, or **Not ru
 
 R-14 and R-15 require the release manager to provide two real signed installers. Testers perform the install and update through the operating-system installer and app controls only. Mark them **Not run** when no older build or critical release is available; do not claim a pass from a component test.
 
-# 11. Failure report and sign-off
+# 12. Failure report and sign-off
 
 For every failure, capture: test ID, app version shown in the release/installer, operating system, signed-in role, screen name, exact clicks/entries, expected result, actual result, screenshot, whether it repeats, and whether the test profile can be restored from backup. Use test customer data only.
 

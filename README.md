@@ -51,6 +51,8 @@ The [desktop build workflow](.github/workflows/desktop-builds.yml) runs the test
 
 The app records PTA status as entered by staff; it does not verify device status with PTA. Use **Save PDF invoice** or **Save PDF job card** to choose a PDF destination. A separate **Print invoice** button opens the system print dialog. Choose an external backup folder on another drive before enabling scheduled copies; a folder on the same disk does not protect against disk failure.
 
+The [PDF user manual and UI-only test guide](output/pdf/MobileShopERP_User_Manual_UI_Test_Guide_v0.4.3.pdf) covers all 27 sidebar pages, connected shop workflows, sample test records, expected results, and a release sign-off sheet. Its [editable source](docs/USER_MANUAL_UI_TESTING.md) can be rendered again with `scripts/render-user-manual.py` when the app changes.
+
 ## Verification
 
 ```bash

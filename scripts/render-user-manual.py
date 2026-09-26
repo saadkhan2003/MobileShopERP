@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import html
+import json
 import re
 from pathlib import Path
 
@@ -28,7 +29,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs" / "USER_MANUAL_UI_TESTING.md"
-OUTPUT = ROOT / "output" / "pdf" / "MobileShopERP_User_Manual_UI_Test_Guide_v0.3.2.pdf"
+VERSION = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
+OUTPUT = ROOT / "output" / "pdf" / f"MobileShopERP_User_Manual_UI_Test_Guide_v{VERSION}.pdf"
 OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 
 REGULAR = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
@@ -121,7 +123,7 @@ def on_page(canvas, doc):
         canvas.line(46, 44, width - 46, 44)
         canvas.setFont("Manual", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(48, 30, "Desktop v0.3.2  |  UI-only testing")
+        canvas.drawString(48, 30, f"Desktop v{VERSION}  |  UI-only testing")
         canvas.drawRightString(width - 48, 30, str(doc.page))
     canvas.restoreState()
 
