@@ -1,6 +1,6 @@
 {
-  "version": "0.4.3",
-  "critical": true,
+  "version": "0.4.4",
+  "critical": false,
   "minimum_version": "0.4.3",
-  "notes": "Release 0.4.3: Refined enterprise sidebar ergonomics, enhanced brand identity scaling, and terminal status indicators."
+  "notes": "Release 0.4.4: Authentic Stack & Scale brand integration with Self-Hosted and SaaS options, new high-res Mobile Shop ERP app icon, TypeScript asset resolution fixes, and executive attribution."
 }
